@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class BookingRequestDto {
     private String agencyId;
+    private String userId;
     private String vehicleId;
     private String fromDate;
     private String toDate;

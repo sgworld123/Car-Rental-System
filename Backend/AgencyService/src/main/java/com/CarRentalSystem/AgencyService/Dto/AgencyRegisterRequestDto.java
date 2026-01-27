@@ -18,6 +18,5 @@ public class AgencyRegisterRequestDto {
     private long phone;
     private String address;
     private String sourceCity;
-    private String password;
     private List<Vehicle> vehicleInfo;
 }

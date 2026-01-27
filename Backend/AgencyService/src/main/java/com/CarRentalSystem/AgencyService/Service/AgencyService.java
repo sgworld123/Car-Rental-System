@@ -69,8 +69,18 @@ public class AgencyService {
                 .sourceCity(agencyRegisterRequestDto.getSourceCity())
                 .email(agencyRegisterRequestDto.getEmail())
                 .phone(agencyRegisterRequestDto.getPhone())
-                .vehicleInfo(agencyRegisterRequestDto.getVehicleInfo())
-                .password(agencyRegisterRequestDto.getPassword()).build();
+                .build();
+
+        List<Vehicle> vehicles = agencyRegisterRequestDto.getVehicleInfo().stream()
+                .map(v -> Vehicle.builder()
+                        .vehicleId("Veh" + (int)(Math.random() * 10000000))
+                        .carModel(v.getCarModel())
+                        .pricePerKm(v.getPricePerKm())
+                        .rating(v.getRating())
+                        .build())
+                .toList();
+        agency.setVehicleInfo(vehicles);
+
         Agency savedAgency = agencyRepository.save(agency);
         System.out.println(savedAgency.getId());
 
@@ -107,4 +117,19 @@ public class AgencyService {
         return agency.getVehicleInfo();
     }
 
+    public boolean isAgencyValid(String agencyId) {
+        return agencyRepository.existsById(agencyId);
+    }
+
+    public boolean isVehicleValid(String vehicleId) {
+        List<Agency> agencies = agencyRepository.findAll();
+        for (Agency agency : agencies) {
+            for (Vehicle vehicle : agency.getVehicleInfo()) {
+                if (vehicle.getVehicleId().equals(vehicleId)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

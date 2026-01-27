@@ -32,4 +32,14 @@ public class AgencyController {
     {
         return agencyService.getAgencyById(agencyId);
     }
+    @GetMapping("/validate/{agencyId}")
+    public boolean validateAgency(@PathVariable String agencyId)
+    {
+        return agencyService.isAgencyValid(agencyId);
+    }
+    @GetMapping("/vehicle/validate/{vehicleId}")
+    public boolean validateVehicle(@PathVariable String vehicleId)
+    {
+        return agencyService.isVehicleValid(vehicleId);
+    }
 }
