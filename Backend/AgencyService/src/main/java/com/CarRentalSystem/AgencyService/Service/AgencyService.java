@@ -1,12 +1,21 @@
 package com.CarRentalSystem.AgencyService.Service;
 
-import com.CarRentalSystem.AgencyService.Dto.RequestDto;
-import com.CarRentalSystem.AgencyService.Dto.ResponseDto;
+import com.CarRentalSystem.AgencyService.Dto.AgencySearchResponse;
+import com.CarRentalSystem.AgencyService.Dto.AgencyRegisterRequestDto;
+import com.CarRentalSystem.AgencyService.Dto.AgencyResponseDto;
 import com.CarRentalSystem.AgencyService.Model.Agency;
+import com.CarRentalSystem.AgencyService.Model.Vehicle;
 import com.CarRentalSystem.AgencyService.Repository.AgencyRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -14,23 +23,88 @@ public class AgencyService {
     @Autowired
     private AgencyRepository agencyRepository;
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @PostConstruct
+    public void printDb() {
+        System.out.println("Connected DB = " + mongoTemplate.getDb().getName());
+    }
+
+    @PostConstruct
+    public void debugMongoUri() {
+        System.out.println("ENV MONGO URI = " + System.getenv("SPRING_DATA_MONGODB_URI"));
+    }
+
+    @Autowired
+    private Environment environment;
+
+    @PostConstruct
+    public void debugSpringConfig() {
+        System.out.println("Active profiles = " + Arrays.toString(environment.getActiveProfiles()));
+        System.out.println("Mongo URI (env) = " + environment.getProperty("spring.data.mongodb.uri"));
+    }
+
+
+    @PostConstruct
+    public void printAllMongoProps() {
+        ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
+
+        env.getPropertySources().forEach(ps -> {
+            if (ps.containsProperty("spring.data.mongodb.uri")) {
+                System.out.println("FOUND IN: " + ps.getName());
+                System.out.println("VALUE  : " + ps.getProperty("spring.data.mongodb.uri"));
+            }
+        });
+    }
+
+
+
     //register agency
-    public ResponseDto registerAgency(RequestDto requestDto)
+    public AgencyResponseDto registerAgency(AgencyRegisterRequestDto agencyRegisterRequestDto)
     {
         Agency agency = Agency.builder()
-                .name(requestDto.getName())
-                .cities(requestDto.getCities())
-                .email(requestDto.getEmail())
-                .phone(requestDto.getPhone())
-                .vehicleInfo(requestDto.getVehicleInfo())
-                .password(requestDto.getPassword()).build();
-        agencyRepository.save(agency);
+                .name(agencyRegisterRequestDto.getName())
+                .address(agencyRegisterRequestDto.getAddress())
+                .sourceCity(agencyRegisterRequestDto.getSourceCity())
+                .email(agencyRegisterRequestDto.getEmail())
+                .phone(agencyRegisterRequestDto.getPhone())
+                .vehicleInfo(agencyRegisterRequestDto.getVehicleInfo())
+                .password(agencyRegisterRequestDto.getPassword()).build();
+        Agency savedAgency = agencyRepository.save(agency);
+        System.out.println(savedAgency.getId());
 
-        return ResponseDto.builder()
-                .email(agency.getEmail())
-                .name(agency.getName())
-                .phone((agency.getPhone()))
+        return AgencyResponseDto.builder()
+                .email(savedAgency.getEmail())
+                .name(savedAgency.getName())
+                .phone((savedAgency.getPhone()))
                 .build();
+    }
+
+    //get agencies with source city
+    public List<AgencySearchResponse> getAgenciesBySourceCity(String sourceCity) {
+        List<Agency> agencies = agencyRepository.findBySourceCity(sourceCity);
+        return agencies.stream().map(agency -> AgencySearchResponse.builder()
+                .name(agency.getName())
+                .email(agency.getEmail())
+                .address(agency.getAddress())
+                .phone(agency.getPhone())
+                .build()).toList();
+    }
+
+    public AgencyResponseDto getAgencyById(String agencyId) {
+        return agencyRepository.findById(agencyId)
+                .map(agency -> AgencyResponseDto.builder()
+                        .name(agency.getName())
+                        .email(agency.getEmail())
+                        .phone(agency.getPhone())
+                        .build())
+                .orElseThrow(() -> new RuntimeException("Agency not found with id: " + agencyId));
+    }
+    public List<Vehicle> getVehiclesByAgencyId(String agencyId) {
+        Agency agency = agencyRepository.findById(agencyId)
+                .orElseThrow(() -> new RuntimeException("Agency not found with id: " + agencyId));
+        return agency.getVehicleInfo();
     }
 
 }

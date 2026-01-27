@@ -7,16 +7,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RequestDto {
+public class AgencyResponseDto {
     private String name;
+    private String id;
     private String email;
     private long phone;
-    private List<String> cities;
-    private String password;
+    private String address;
+    private String sourceCity;
     private List<Vehicle> vehicleInfo;
+
 }

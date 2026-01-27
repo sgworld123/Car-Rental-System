@@ -1,22 +1,18 @@
-package com.CarRentalSystem.AgencyService.Model;
+package com.CarRentalSystem.AgencyService.Dto;
 
+import com.CarRentalSystem.AgencyService.Model.Vehicle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document(collection = "AgencyData")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class Agency {
-    @Id
-    private String id;
+public class AgencyRegisterRequestDto {
     private String name;
     private String email;
     private long phone;

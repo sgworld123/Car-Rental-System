@@ -1,3 +1,18 @@
 spring:
-  profiles:
-    active: prod
+  application:
+    name: AGENCYSERVICE
+
+
+  data:
+    mongodb:
+      uri: mongodb+srv://Shreyansh:Pass123@cluster0.hlz9zmj.mongodb.net/CarRentalSystem
+
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
