@@ -1,4 +1,4 @@
-package com.CarRentalSystem.BookingService.Models;
+package com.CarRentalSystem.BookingService.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class BookingResponseDto {
-    private String bookingId;
+    private String BookingId;
     private String bookingStatus;
-    private String totlecost;
+    private double totlecost;
 }

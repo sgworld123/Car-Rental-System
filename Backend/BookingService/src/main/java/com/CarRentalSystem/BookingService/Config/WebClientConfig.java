@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     @Bean
-    @LoadBalanced
+//    @LoadBalanced
     public WebClient.Builder webClientBuilder() {
         return WebClient.builder();
     }
@@ -17,7 +17,13 @@ public class WebClientConfig {
     @Bean
     public WebClient agencyWebClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder
-                .baseUrl("http://AGENCYSERVICE")
+                .baseUrl("http://localhost:8082")
+                .build();
+    }
+    @Bean
+    public WebClient userWebClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder
+                .baseUrl("http://localhost:8081")
                 .build();
     }
 

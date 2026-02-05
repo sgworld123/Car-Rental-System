@@ -27,4 +27,8 @@ public class UserService {
                 .name(user.getName())
                 .email(user.getEmail()).build();
     }
+
+    public Boolean validateUser(String userId) {
+        return userRepository.findById(userId).isPresent();
+    }
 }

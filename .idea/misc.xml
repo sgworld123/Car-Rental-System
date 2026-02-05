@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/Backend/AgencyService/pom.xml" />
         <option value="$PROJECT_DIR$/Backend/eureka/pom.xml" />
         <option value="$PROJECT_DIR$/Backend/BookingService/pom.xml" />
+        <option value="$PROJECT_DIR$/Backend/Gateway/pom.xml" />
       </list>
     </option>
     <option name="workspaceImportForciblyTurnedOn" value="true" />

@@ -23,43 +23,6 @@ public class AgencyService {
     @Autowired
     private AgencyRepository agencyRepository;
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
-
-    @PostConstruct
-    public void printDb() {
-        System.out.println("Connected DB = " + mongoTemplate.getDb().getName());
-    }
-
-    @PostConstruct
-    public void debugMongoUri() {
-        System.out.println("ENV MONGO URI = " + System.getenv("SPRING_DATA_MONGODB_URI"));
-    }
-
-    @Autowired
-    private Environment environment;
-
-    @PostConstruct
-    public void debugSpringConfig() {
-        System.out.println("Active profiles = " + Arrays.toString(environment.getActiveProfiles()));
-        System.out.println("Mongo URI (env) = " + environment.getProperty("spring.data.mongodb.uri"));
-    }
-
-
-    @PostConstruct
-    public void printAllMongoProps() {
-        ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
-
-        env.getPropertySources().forEach(ps -> {
-            if (ps.containsProperty("spring.data.mongodb.uri")) {
-                System.out.println("FOUND IN: " + ps.getName());
-                System.out.println("VALUE  : " + ps.getProperty("spring.data.mongodb.uri"));
-            }
-        });
-    }
-
-
-
     //register agency
     public AgencyResponseDto registerAgency(AgencyRegisterRequestDto agencyRegisterRequestDto)
     {
