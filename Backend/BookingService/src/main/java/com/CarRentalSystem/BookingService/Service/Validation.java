@@ -14,7 +14,6 @@ public class Validation {
     private final WebClient userWebClient;
     private final WebClient agencyWebClient;
     private final BookingRepository bookingRepository;
-    private final BookingDatesRepository bookingDatesRepository;
     private final RedisTemplate redisTemplate;
 
     public boolean isUserValid(String userId) {
