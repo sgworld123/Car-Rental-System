@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UserController {
-    @Autowired
-    UserService userService;
+    private final UserService userService;
     @PostMapping("/register")
     public ResponseDto registerUser(@RequestBody RequestDto requestDto)
     {
