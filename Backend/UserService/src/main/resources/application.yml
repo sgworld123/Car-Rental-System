@@ -1,3 +1,21 @@
 spring:
-  profiles:
-    active: prod
+  application:
+    name: USERSERVICE
+
+  data:
+    mongodb:
+      uri: mongodb+srv://Shreyansh:Pass123@cluster0.hlz9zmj.mongodb.net/CarRentalSystem
+
+server:
+  port: 8081
+
+eureka:
+  instance:
+    ip-address: 127.0.0.1
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+jwt:
+  secretKey: "liviwuvawihpp9488pp98vnn4IONH4A38AON434V9LIIUBSIRU895S48V8VVSO9V84909"

@@ -43,6 +43,7 @@ public class AuthService {
         authUser = authUserRepository.save(AuthUser.builder()
                 .username(signupRequestDto.getUsername())
                 .password(passwordEncoder.encode(signupRequestDto.getPassword()))
+                .role("USER")
                 .build());
 
         return SignupResponseDto.builder()

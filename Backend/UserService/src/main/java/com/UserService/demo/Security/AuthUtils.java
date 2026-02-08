@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
 
-import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @Component
 public class AuthUtils {
@@ -25,21 +25,27 @@ public class AuthUtils {
     }
     public String generateAccessToken(AuthUser authUser)
     {
+        HashMap<String,Object> claims = new HashMap<>();
+        claims.put("userId",authUser.getId());
+        claims.put("roles",authUser.getAuthorities()
+                .stream()
+                .map(a-> a.getAuthority())
+                .toList());
+
         return Jwts.builder()
                 .setSubject(authUser.getUsername())
-                .claim("userId",authUser.getId())
+                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
                 .signWith(getSecretKey())
                 .compact();
     }
 
-    public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
+    public Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(getSecretKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject();
     }
 }

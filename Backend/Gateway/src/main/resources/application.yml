@@ -6,9 +6,14 @@ spring:
     gateway:
       routes:
         - id: USERSERVICE
-          uri: lb://USER-SERVICE
+          uri: lb://USERSERVICE
           predicates:
-            - Path=/api/users/**
+            - Path=/api/user/**
+        - id: AUTHSERVICE
+          uri: lb://USERSERVICE
+          predicates:
+            - Path=/api/auth/**
+
         - id: AGENCYSERVICE
           uri: lb://AGENCYSERVICE
           predicates:
@@ -17,12 +22,21 @@ spring:
           uri: lb://BOOKINGSERVICE
           predicates:
               - Path=/api/bookings/**
-
 server:
   port: 8090
 
+
 eureka:
+  instance:
+    ip-address: 127.0.0.1
+    prefer-ip-address: true
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: true
+
+jwt:
+  secretKey: "liviwuvawihpp9488pp98vnn4IONH4A38AON434V9LIIUBSIRU895S48V8VVSO9V84909"
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
