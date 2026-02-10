@@ -34,7 +34,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
             return;
         }
-        String token = requestTokenHeader.split("Bearer")[1];
+        String token = requestTokenHeader.split("Bearer ")[1];
         Claims claims = authUtils.extractClaims(token);
 
         String username = claims.getSubject();
@@ -43,7 +43,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         List<String> roles = claims.get("roles",List.class);
 
         List<SimpleGrantedAuthority> authorities = roles.stream()
-                .map(SimpleGrantedAuthority::new)
+                .map(role -> new SimpleGrantedAuthority(role))
                 .toList();
         JwtUserPrinciple jwtUserPrinciple = new JwtUserPrinciple(userId,username);
 

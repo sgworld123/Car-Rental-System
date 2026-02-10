@@ -41,11 +41,11 @@ public class AuthUtils {
                 .compact();
     }
 
-    public Claims extractClaims(String token) {
+    public Claims extractClaims(String jwtToken) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSecretKey())
                 .build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(jwtToken)
                 .getBody();
     }
 }
