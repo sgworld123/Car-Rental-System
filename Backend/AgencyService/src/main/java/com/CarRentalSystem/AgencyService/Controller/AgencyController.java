@@ -23,8 +23,8 @@ public class AgencyController {
     {
         return agencyService.registerAgency(agencyRegisterRequestDto);
     }
-    @GetMapping
-    public List<AgencySearchResponse> searchAgencies(@RequestParam SearchRequestDto searchRequestDto) {
+    @PostMapping("/search")
+    public List<AgencySearchResponse> searchAgencies(@RequestBody SearchRequestDto searchRequestDto) {
         return agencyService.getAgenciesBySourceCity(searchRequestDto.getSourceCity());
     }
     @GetMapping("/{agencyId}")

@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
-    @PostMapping("/register")
-    public ResponseDto registerUser(@RequestBody RequestDto requestDto)
-    {
-        return userService.registerUser(requestDto);
-    }
+//    @PostMapping("/register")
+//    public ResponseDto registerUser(@RequestBody RequestDto requestDto)
+//    {
+//        return userService.registerUser(requestDto);
+//    }
     @GetMapping("/validate/{userId}")
     public Boolean validateUser(@PathVariable String userId)
     {

@@ -58,6 +58,7 @@ public class AgencyService {
     public List<AgencySearchResponse> getAgenciesBySourceCity(String sourceCity) {
         List<Agency> agencies = agencyRepository.findBySourceCity(sourceCity);
         return agencies.stream().map(agency -> AgencySearchResponse.builder()
+                .id(agency.getId())
                 .name(agency.getName())
                 .email(agency.getEmail())
                 .address(agency.getAddress())

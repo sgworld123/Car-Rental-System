@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class AgencySearchResponse {
+    private String id;
     private String name;
     private String email;
     private String address;
