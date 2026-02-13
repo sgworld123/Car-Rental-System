@@ -216,6 +216,7 @@ const Home = () => {
                 position: 'relative'
               }}
               onClick={() => {
+                console.log("Navigating to agency details for ID:", agency.id);
                 navigate(`/agency/${agency.id}`);
               }}
               onMouseEnter={(e) => {

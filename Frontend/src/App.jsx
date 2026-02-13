@@ -4,6 +4,7 @@ import Login from './Pages/Login'
 import Register from './Pages/Register'
 import Home from './Pages/Home'
 import DashBoardLayout from './Pages/DashBoardLayout'
+import AgencyPage from './Pages/AgencyPage'
 function App() {
   return (
       <Routes>
@@ -13,7 +14,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="profile" element={<div>Profile Page</div>} />
         </Route>  
-        <Route path="/agency/:agencyId" element={<AgencyPage />} />
+        <Route path="/agency/:id" element={<AgencyPage />} />
       </Routes>
   );  
 }
