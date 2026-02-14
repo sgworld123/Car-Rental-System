@@ -12,15 +12,17 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class JwtUtils {
     @Value("${jwt.secretKey}")
-    private static String jwtSecretKey;
-    public static Claims extractClaims(String token) {
+    private String jwtSecretKey;
+
+    public Claims extractClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSecretKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
-    public static SecretKey getSecretKey()
+
+    public SecretKey getSecretKey()
     {
         return Keys.hmacShaKeyFor(jwtSecretKey.getBytes(StandardCharsets.UTF_8));
     }

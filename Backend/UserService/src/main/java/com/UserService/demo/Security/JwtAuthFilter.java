@@ -1,6 +1,5 @@
 package com.UserService.demo.Security;
 
-import com.UserService.demo.Repository.AuthUserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,18 +22,18 @@ import java.util.List;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final AuthUtils authUtils;
-    private final AuthUserRepository authUserRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("Incoming request : {}" , request.getRequestURI());
 
         final String requestTokenHeader = request.getHeader("Authorization");
-        if(requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer"))
+        if(requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer "))
         {
             filterChain.doFilter(request,response);
             return;
         }
-        String token = requestTokenHeader.split("Bearer ")[1];
+        String token = requestTokenHeader.substring(7);
         Claims claims = authUtils.extractClaims(token);
 
         String username = claims.getSubject();
@@ -54,5 +53,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         authorities
         );
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        filterChain.doFilter(request,response);
     }
 }
