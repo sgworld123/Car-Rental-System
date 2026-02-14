@@ -24,4 +24,9 @@ public class AuthController {
     {
         return ResponseEntity.ok(authService.signup(loginRequestDto));
     }
+//    @GetMapping("/getUidFromToken")
+//    public ResponseEntity<String> getUidFromToken(@RequestHeader("Authorization") String token)
+//    {
+//        return ResponseEntity.ok(authService.getUserIdFromToken(token.substring(7)));
+    }
 }

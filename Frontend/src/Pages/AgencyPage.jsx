@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useSearchAgencyById } from "../Hooks/useSearchAgencyById";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const AgencyPage = () => {
-    const navigate = Navigate();
+    const navigate = useNavigate();
     const { id } = useParams();
     const { agency, loading, error, searchedAgency } = useSearchAgencyById();
 
@@ -108,7 +108,7 @@ const AgencyPage = () => {
     };
     const handleRent = (vehicle) => {
         console.log("Renting vehicle:", vehicle.vehicleId);
-        navigate()
+        navigate("/confirm-booking", { state: { vehicle } });
     }
 
     return (
@@ -176,8 +176,6 @@ const AgencyPage = () => {
                                             >
                                                 Book Now
                                             </button>
-
-
                                             <div style={styles.vehicleDetail}>
                                                 <span style={styles.vehicleLabel}>Vehicle ID:</span>{" "}
                                                 {vehicle.vehicleId}

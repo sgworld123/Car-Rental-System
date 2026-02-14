@@ -6,6 +6,7 @@ import com.UserService.demo.Dto.SignupResponseDto;
 import com.UserService.demo.Model.AuthUser;
 import com.UserService.demo.Model.User;
 import com.UserService.demo.Repository.AuthUserRepository;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,4 +52,9 @@ public class AuthService {
                 .id(authUser.getId())
                 .build();
     }
+
+//    public String getUserIdFromToken(String substring) {
+//        Claims claims = authUtils.extractClaims(substring);
+//        return claims.get("userId").toString();
+//    }
 }

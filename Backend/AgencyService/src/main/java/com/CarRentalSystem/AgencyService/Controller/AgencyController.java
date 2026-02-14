@@ -7,7 +7,6 @@ import com.CarRentalSystem.AgencyService.Dto.SearchRequestDto;
 import com.CarRentalSystem.AgencyService.Model.Agency;
 import com.CarRentalSystem.AgencyService.Service.AgencyService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

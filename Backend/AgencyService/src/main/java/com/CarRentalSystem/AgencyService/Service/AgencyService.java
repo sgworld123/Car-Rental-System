@@ -70,8 +70,12 @@ public class AgencyService {
         return agencyRepository.findById(agencyId)
                 .map(agency -> AgencyResponseDto.builder()
                         .name(agency.getName())
+                        .id(agency.getId())
                         .email(agency.getEmail())
                         .phone(agency.getPhone())
+                        .address(agency.getAddress())
+                        .sourceCity(agency.getSourceCity())
+                        .vehicleInfo(agency.getVehicleInfo())
                         .build())
                 .orElseThrow(() -> new RuntimeException("Agency not found with id: " + agencyId));
     }
