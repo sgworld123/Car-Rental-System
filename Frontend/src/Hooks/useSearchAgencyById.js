@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { getAgencyById } from '../Services/agencyService';
 
-
 export function useSearchAgencyById() {
     const [agency, setAgency] = useState(null);
     const [loading, setLoading] = useState(true);

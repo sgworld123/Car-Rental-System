@@ -6,6 +6,7 @@ import Home from './Pages/Home'
 import DashBoardLayout from './Pages/DashBoardLayout'
 import AgencyPage from './Pages/AgencyPage'
 import { ConfirmBooking } from './Pages/ConfirmBooking'
+import VehicleDetails from './Pages/VehicleDetails'
 function App() {
   return (
       <Routes>
@@ -16,6 +17,7 @@ function App() {
           <Route path="profile" element={<div>Profile Page</div>} />
         </Route>  
         <Route path="/agency/:id" element={<AgencyPage />} />
+        <Route path="/vehicle-details/:vehicleId" element={<VehicleDetails />} />
         <Route path="/confirm-booking" element={<ConfirmBooking />} />
       </Routes>
   );  

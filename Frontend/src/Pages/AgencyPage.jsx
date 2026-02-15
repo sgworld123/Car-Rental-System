@@ -7,6 +7,10 @@ const AgencyPage = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const { agency, loading, error, searchedAgency } = useSearchAgencyById();
+    const params = new URLSearchParams(location.search);
+
+    const fromDate = params.get("from");
+    const toDate = params.get("to");
 
     useEffect(() => {
         console.log("AgencyPage mounted with ID:", id);
@@ -106,11 +110,6 @@ const AgencyPage = () => {
             fontSize: "15px"
         }
     };
-    const handleRent = (vehicle) => {
-        console.log("Renting vehicle:", vehicle.vehicleId);
-        navigate("/confirm-booking", { state: { vehicle } });
-    }
-
     return (
         <div style={styles.page}>
             <div style={styles.container}>
@@ -172,7 +171,7 @@ const AgencyPage = () => {
 
                                             <button
                                                 style={styles.rentButton}
-                                                onClick={() => handleRent(vehicle)}
+                                                onClick={() => navigate(`/vehicle-details/${vehicle.vehicleId}?from=${fromDate}&to=${toDate}`)}
                                             >
                                                 Book Now
                                             </button>

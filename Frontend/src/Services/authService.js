@@ -1,11 +1,9 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:8090/api/auth';
+import api from "./api";
 
 export const login = (credentials) => {
-    return axios.post(`${API_URL}/login`,credentials);
-}
+  return api.post("/api/auth/login", credentials);
+};
 
 export const register = (userData) => {
-    return axios.post(`${API_URL}/signup`,userData);
-}
+  return api.post("/api/auth/signup", userData);
+};

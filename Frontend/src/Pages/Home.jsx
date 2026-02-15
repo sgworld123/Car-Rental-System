@@ -217,7 +217,10 @@ const Home = () => {
               }}
               onClick={() => {
                 console.log("Navigating to agency details for ID:", agency.id);
-                navigate(`/agency/${agency.id}`);
+                const { fromDate, toDate } = tripData;
+                navigate(
+                  `/agency/${agency.id}?from=${fromDate}&to=${toDate}`
+                );
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#333333';

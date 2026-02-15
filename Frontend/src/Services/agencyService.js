@@ -1,11 +1,13 @@
-import axios from "axios";
-
-const API_URL = "http://localhost:8090/api/agency";
+import api from "./api";
 
 export const searchAgencies = (searchData) => {
-  return axios.post(`${API_URL}/search`, searchData);
+  return api.post("/api/agency/search", searchData);
 };
 
 export const getAgencyById = (agencyId) => {
-  return axios.get(`${API_URL}/${agencyId}`);
-}
+  return api.get(`/api/agency/${agencyId}`);
+};
+
+export const getVehicleById = (vehicleId) => {
+  return api.get(`/api/agency/vehicle/${vehicleId}`);
+};
