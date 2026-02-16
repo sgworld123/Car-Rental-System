@@ -13,12 +13,13 @@ import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends MongoRepository<Booking, String> {
-
     Optional<Booking> findByBookingId(String bookingId);
 
     List<Booking> findByStatusAndEndDateBefore(
             BookingStatus status,
             LocalDate date
     );
+
+    Optional<Object> findByUserId(String userId);
 }
 

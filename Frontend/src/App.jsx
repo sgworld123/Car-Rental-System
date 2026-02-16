@@ -7,6 +7,7 @@ import DashBoardLayout from './Pages/DashBoardLayout'
 import AgencyPage from './Pages/AgencyPage'
 import { ConfirmBooking } from './Pages/ConfirmBooking'
 import VehicleDetails from './Pages/VehicleDetails'
+import MyBookings from './Pages/MyBookings'
 function App() {
   return (
       <Routes>
@@ -15,10 +16,12 @@ function App() {
         <Route path='/dashboard' element={<DashBoardLayout />}>
           <Route index element={<Home />} />
           <Route path="profile" element={<div>Profile Page</div>} />
+          <Route path="bookings" element={<MyBookings />} />
         </Route>  
         <Route path="/agency/:id" element={<AgencyPage />} />
         <Route path="/vehicle-details/:vehicleId" element={<VehicleDetails />} />
         <Route path="/confirm-booking" element={<ConfirmBooking />} />
+        
       </Routes>
   );  
 }

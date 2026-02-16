@@ -100,4 +100,16 @@ public class AgencyService {
         }
         return false;
     }
+
+    public Vehicle getVehicleById(String vehicleId) {
+        List<Agency> agencies = agencyRepository.findAll();
+        for (Agency agency : agencies) {
+            for (Vehicle vehicle : agency.getVehicleInfo()) {
+                if (vehicle.getVehicleId().equals(vehicleId)) {
+                    return vehicle;
+                }
+            }
+        }
+        throw new RuntimeException("Vehicle not found with id: " + vehicleId);
+    }
 }

@@ -1,7 +1,7 @@
 import api from "./api";
 
 export const createBooking = (bookingData) => {
-  return api.post("/api/booking/create", bookingData);
+  return api.post("/api/booking", bookingData);
 };
 
 export const cancelBooking = (bookingId) => {
@@ -12,6 +12,6 @@ export const confirmBooking = (bookingId) => {
   return api.post("/api/booking/confirm", { bookingId });
 };
 
-export const getUserBookings = (userId) => {
-  return api.get(`/api/booking/user/${userId}`);
+export const getUserBookings = () => {
+  return api.get(`/api/booking/my`);
 };

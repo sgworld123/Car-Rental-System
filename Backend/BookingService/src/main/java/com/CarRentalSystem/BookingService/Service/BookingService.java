@@ -1,10 +1,12 @@
 package com.CarRentalSystem.BookingService.Service;
 
+import com.CarRentalSystem.BookingService.Dto.BookingByIdResponse;
 import com.CarRentalSystem.BookingService.Dto.BookingRequestDto;
 import com.CarRentalSystem.BookingService.Dto.BookingResponseDto;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Models.BookingStatus;
 import com.CarRentalSystem.BookingService.Repository.BookingRepository;
+import com.CarRentalSystem.BookingService.Utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,18 +27,8 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final RedisTemplate redisTemplate;
     @Transactional
-    public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto)
+    public BookingResponseDto createBooking(String userId ,BookingRequestDto bookingRequestDto)
     {
-//        check if the user , agency  isValid
-        boolean isValid = validation.isUserValid(bookingRequestDto.getUserId()) &&
-                validation.isAgencyValid(bookingRequestDto.getAgencyId()) &&
-                validation.isVehicleValid(bookingRequestDto.getVehicleId()
-                );
-
-        if (!isValid) {
-            throw new RuntimeException("user/agency is invalid");
-        }
-
         boolean isAvailable = validation.isVehicleAvailable(
                 bookingRequestDto.getVehicleId(),
                 bookingRequestDto.getFromDate(),
@@ -49,7 +41,6 @@ public class BookingService {
         String bookingId = UUID.randomUUID().toString();
 
         List<String> lockedKeys = new ArrayList<>();
-
         try {
             for (LocalDate date = bookingRequestDto.getFromDate();
                  !date.isAfter(bookingRequestDto.getToDate());
@@ -68,7 +59,6 @@ public class BookingService {
                 if (Boolean.FALSE.equals(acquired)) {
                     throw new RuntimeException("Vehicle unavailable on " + date);
                 }
-
                 lockedKeys.add(key);
             }
         } catch (Exception e) {
@@ -77,8 +67,7 @@ public class BookingService {
         }
         Booking booking = Booking.builder()
                 .bookingId(bookingId)
-                .agencyId(bookingRequestDto.getAgencyId())
-                .userId(bookingRequestDto.getUserId())
+                .userId(userId)
                 .vehicleId(bookingRequestDto.getVehicleId())
                 .cost(getCost(bookingRequestDto))
                 .fromDate(bookingRequestDto.getFromDate())
@@ -160,5 +149,17 @@ public class BookingService {
             booking.setUpdatedAt(java.time.LocalDate.now());
         });
         bookingRepository.saveAll(bookings);
+    }
+
+    public BookingByIdResponse getBooking(String userId) {
+        Booking booking = (Booking) bookingRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        return BookingByIdResponse.builder()
+                .vehicleId(booking.getVehicleId())
+                .cost(booking.getCost())
+                .fromDate(booking.getFromDate())
+                .endDate(booking.getEndDate())
+                .status(booking.getStatus())
+                .build();
     }
 }

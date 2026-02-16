@@ -94,10 +94,7 @@ const Header = () => {
         <NavLink to={"/dashboard"} style={styles.navButton}  onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
           Home
         </NavLink>
-        <NavLink to={"/past-trips"} style={styles.navButton} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-          Past Trips
-        </NavLink>
-        <NavLink to={"/bookings"} style={styles.navButton} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <NavLink to={"/dashboard/bookings"} style={styles.navButton} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
           Bookings
         </NavLink>
         <NavLink to={"/profile"} style={styles.navButton} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>

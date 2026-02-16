@@ -18,7 +18,7 @@ public class Validation {
 
     public boolean isUserValid(String userId) {
         Boolean isValid = userWebClient.get()
-                .uri("/user/validate/{userId}", userId)
+                .uri("/validate/{userId}", userId)
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .block();
@@ -28,7 +28,7 @@ public class Validation {
 
     public boolean isAgencyValid(String agencyId) {
         Boolean isValid = agencyWebClient.get()
-                .uri("/agency/validate/{agencyId}", agencyId)
+                .uri("/validate/{agencyId}", agencyId)
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .block();
@@ -37,7 +37,7 @@ public class Validation {
 
     public boolean isVehicleValid(String vehicleId) {
         Boolean isValid = agencyWebClient.get()
-                .uri("/agency/vehicle/validate/{vehicleId}", vehicleId)
+                .uri("/vehicle/validate/{vehicleId}", vehicleId)
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .block();

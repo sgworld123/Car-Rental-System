@@ -1,5 +1,6 @@
 package com.CarRentalSystem.BookingService.Dto;
 
+import com.CarRentalSystem.BookingService.Utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,11 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class BookingRequestDto {
-    private String agencyId;
-    private String userId;
     private String vehicleId;
     private int cost;
     private LocalDate fromDate;
     private LocalDate toDate;
-
 }

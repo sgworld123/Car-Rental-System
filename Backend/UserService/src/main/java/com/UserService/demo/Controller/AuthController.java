@@ -28,5 +28,5 @@ public class AuthController {
 //    public ResponseEntity<String> getUidFromToken(@RequestHeader("Authorization") String token)
 //    {
 //        return ResponseEntity.ok(authService.getUserIdFromToken(token.substring(7)));
-    }
+//    }
 }

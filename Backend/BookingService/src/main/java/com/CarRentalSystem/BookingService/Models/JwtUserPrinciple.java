@@ -1,6 +1,6 @@
-package com.UserService.demo.Security;
+package com.CarRentalSystem.BookingService.Models;
 
-public class JwtUserPrinciple{
+public class JwtUserPrinciple {
     private String userId;
     private String username;
 

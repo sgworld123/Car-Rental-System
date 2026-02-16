@@ -1,17 +1,17 @@
-import { useState } from "react";
 import { createBooking } from "../Services/bookingService";
 
 export function useCreateBooking() {
-    const[bookingData,setBookingData] = useState(null);
 
-    const handleCreateBooking = async() => {
+    const handleCreateBooking = async (payload) => {
         try {
-            const response = await createBooking(bookingData);
-            setBookingData(response.data);
+            const response = await createBooking(payload);
             console.log("Booking created successfully:", response.data);
+            return response.data;   
         } catch (error) {
             console.error("Error creating booking:", error);
+            throw error;  
         }
-    }
-    return { bookingData, handleCreateBooking };
+    };
+
+    return { handleCreateBooking };
 }

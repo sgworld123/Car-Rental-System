@@ -17,13 +17,13 @@ public class WebClientConfig {
     @Bean
     public WebClient agencyWebClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder
-                .baseUrl("http://localhost:8082")
+                .baseUrl("http://localhost:8090/api/agency")
                 .build();
     }
     @Bean
     public WebClient userWebClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder
-                .baseUrl("http://localhost:8081")
+                .baseUrl("http://localhost:8090/api/user")
                 .build();
     }
 

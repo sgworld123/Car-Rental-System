@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useVehicleById } from '../Hooks/useVehicleById';
+import { useCreateBooking } from '../Hooks/useCreateBooking';
 
 const VehicleDetails = () => {
     const location = useLocation();
@@ -9,11 +10,15 @@ const VehicleDetails = () => {
 
     const [showModal, setShowModal] = useState(false);
 
+    const[bookingLoading,setBookingLoading] = useState(false);
+
     const { vehicle, loading, error, fetchVehicle } = useVehicleById(vehicleId);
 
     const params = new URLSearchParams(location.search);
     const fromDate = params.get("from");
     const toDate = params.get("to");
+
+    const { handleCreateBooking } = useCreateBooking();
 
     useEffect(() => {
         fetchVehicle();
@@ -26,6 +31,24 @@ const VehicleDetails = () => {
         }
         setShowModal(true);
     };
+
+    const confirmBooking = async () => {
+        const payload = {
+            vehicleId,
+            fromDate,
+            toDate
+        };
+        try{
+            setBookingLoading(true);
+            await handleCreateBooking(payload);
+            setBookingLoading(false);
+            setShowModal(false);
+            navigate("/dashboard/bookings");
+        }
+        catch(error){
+            console.error("Booking failed:", error);
+            alert("Failed to create booking. Please try again.");}
+    }
 
     const days =
         fromDate && toDate
@@ -77,8 +100,8 @@ const VehicleDetails = () => {
                                 Cancel
                             </button>
 
-                            <button style={confirmBtn} onClick={() => confirmBooking(vehicleId, fromDate, toDate, navigate)}>
-                                Confirm
+                            <button style={confirmBtn} disabled={bookingLoading} onClick={confirmBooking}>
+                                {bookingLoading ? "Booking..." : "Confirm"}
                             </button>
                         </div>
 
@@ -88,8 +111,6 @@ const VehicleDetails = () => {
         </div>
     );
 };
-
-/* ===== Styles ===== */
 
 const page = {
     minHeight: "100vh",

@@ -5,6 +5,7 @@ import com.CarRentalSystem.AgencyService.Dto.AgencyRegisterRequestDto;
 import com.CarRentalSystem.AgencyService.Dto.AgencyResponseDto;
 import com.CarRentalSystem.AgencyService.Dto.SearchRequestDto;
 import com.CarRentalSystem.AgencyService.Model.Agency;
+import com.CarRentalSystem.AgencyService.Model.Vehicle;
 import com.CarRentalSystem.AgencyService.Service.AgencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -40,5 +41,10 @@ public class AgencyController {
     public boolean validateVehicle(@PathVariable String vehicleId)
     {
         return agencyService.isVehicleValid(vehicleId);
+    }
+    @GetMapping("/vehicle/{vehicleId}")
+    public Vehicle getVehicleById(@PathVariable String vehicleId)
+    {
+        return agencyService.getVehicleById(vehicleId);
     }
 }
