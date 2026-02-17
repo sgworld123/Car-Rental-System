@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { getUserBookings } from "../Services/bookingService";
+import { useCancelBooking } from "../Hooks/useCancelBooking";
 
 const MyBookings = () => {
-
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { cancel, cancelLoading, cancelError } = useCancelBooking();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -19,7 +21,6 @@ const MyBookings = () => {
           : [];
 
         setBookings(data);
-
       } catch (err) {
         console.error("Error fetching bookings:", err);
         setError("Failed to load bookings.");
@@ -31,22 +32,35 @@ const MyBookings = () => {
     fetchBookings();
   }, []);
 
+  const handleCancel = async (id) => {
+    try {
+      console.log("Sending bookingId:", id);
+      await cancel(id);
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.bookingId === id ? { ...b, status: "CANCELLED" } : b
+        )
+      );
+    } catch (e) {
+      console.error("Cancel failed", e);
+    }
+  };
+
   return (
     <div style={page}>
-
       <h1 style={title}>My Bookings</h1>
 
       {loading && <p style={infoText}>Loading bookings...</p>}
       {error && <p style={errorText}>{error}</p>}
+      {cancelError && <p style={errorText}>Cancel failed.</p>}
 
       {!loading && bookings.length === 0 && (
         <p style={infoText}>No bookings yet.</p>
       )}
 
       <div style={list}>
-        {bookings.map((b, index) => (
-          <div key={index} style={card}>
-
+        {bookings.map((b) => (
+          <div key={b.bookingId} style={card}>
             <div style={row}>
               <h3 style={vehicle}>Vehicle ID: {b.vehicleId}</h3>
 
@@ -58,7 +72,7 @@ const MyBookings = () => {
                       ? "#14532d"
                       : b.status === "CANCELLED"
                       ? "#7f1d1d"
-                      : "#3f3f46"
+                      : "#3f3f46",
                 }}
               >
                 {b.status}
@@ -72,10 +86,26 @@ const MyBookings = () => {
 
             <h3 style={price}>₹{b.cost}</h3>
 
+            {b.status === "PENDING" && (
+              <button
+                onClick={() => handleCancel(b.bookingId)}
+                disabled={cancelLoading}
+                style={{
+                  marginTop: 12,
+                  padding: "8px 16px",
+                  background: cancelLoading ? "#444" : "#b91c1c",
+                  border: "none",
+                  borderRadius: 6,
+                  color: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                {cancelLoading ? "Cancelling..." : "Cancel Booking"}
+              </button>
+            )}
           </div>
         ))}
       </div>
-
     </div>
   );
 };

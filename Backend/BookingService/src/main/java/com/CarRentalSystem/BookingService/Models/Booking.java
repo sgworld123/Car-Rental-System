@@ -15,6 +15,8 @@ import java.time.LocalDate;
 @Builder
 @Document(collection = "BookingData")
 public class Booking {
+    @Id
+    private String id;
     private String bookingId;
     private String agencyId;
     private String userId;

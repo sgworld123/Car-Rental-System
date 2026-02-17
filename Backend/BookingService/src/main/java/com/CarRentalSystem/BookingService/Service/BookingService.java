@@ -3,6 +3,7 @@ package com.CarRentalSystem.BookingService.Service;
 import com.CarRentalSystem.BookingService.Dto.BookingByIdResponse;
 import com.CarRentalSystem.BookingService.Dto.BookingRequestDto;
 import com.CarRentalSystem.BookingService.Dto.BookingResponseDto;
+import com.CarRentalSystem.BookingService.Dto.RequestId;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Models.BookingStatus;
 import com.CarRentalSystem.BookingService.Repository.BookingRepository;
@@ -33,7 +34,10 @@ public class BookingService {
                 bookingRequestDto.getVehicleId(),
                 bookingRequestDto.getFromDate(),
                 bookingRequestDto.getToDate()
-        );
+        ) && !validation.isVehicleBooked(
+                bookingRequestDto.getVehicleId(),
+                bookingRequestDto.getFromDate(),
+                bookingRequestDto.getToDate());
 
         if (!isAvailable) {
             throw new RuntimeException("Vehicle is not available for the selected dates");
@@ -126,8 +130,10 @@ public class BookingService {
                 .build();
     }
 
-    public Booking cancelBooking(String bookingId) {
-        Booking booking = bookingRepository.findById(bookingId)
+    public Booking cancelBooking(RequestId boookingId) {
+        String bookingId = boookingId.getBookingId();
+        System.out.println("Booking id recieved : " +boookingId);
+        Booking booking = bookingRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
         if(booking.getStatus() == BookingStatus.CONFIRMED) {
             throw new RuntimeException("CONFIRMED SEATES WILL NOT BE CANCELLED");
@@ -151,15 +157,24 @@ public class BookingService {
         bookingRepository.saveAll(bookings);
     }
 
-    public BookingByIdResponse getBooking(String userId) {
-        Booking booking = (Booking) bookingRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
-        return BookingByIdResponse.builder()
-                .vehicleId(booking.getVehicleId())
-                .cost(booking.getCost())
-                .fromDate(booking.getFromDate())
-                .endDate(booking.getEndDate())
-                .status(booking.getStatus())
-                .build();
+    public List<BookingByIdResponse> getBooking(String userId) {
+        List<Optional<Object>> bookings = bookingRepository.findByUserId(userId);
+        List<BookingByIdResponse> response = new ArrayList<>();
+        for(Optional<Object> booking : bookings)
+        {
+            if(booking.isPresent())
+            {
+                Booking b = (Booking) booking.get();
+                response.add(BookingByIdResponse.builder()
+                        .bookingId(b.getBookingId())
+                        .vehicleId(b.getVehicleId())
+                        .cost(b.getCost())
+                        .fromDate(b.getFromDate())
+                        .endDate(b.getEndDate())
+                        .status(b.getStatus())
+                        .build());
+            }
+        }
+        return response;
     }
 }

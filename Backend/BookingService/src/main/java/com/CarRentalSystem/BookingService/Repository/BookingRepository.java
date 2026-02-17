@@ -20,6 +20,12 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
             LocalDate date
     );
 
-    Optional<Object> findByUserId(String userId);
+    List<Optional<Object>> findByUserId(String userId);
+    boolean existsByVehicleIdAndStatusAndFromDateLessThanEqualAndEndDateGreaterThanEqual(
+            String vehicleId,
+            BookingStatus status,
+            LocalDate date1,
+            LocalDate date2
+    );
 }
 

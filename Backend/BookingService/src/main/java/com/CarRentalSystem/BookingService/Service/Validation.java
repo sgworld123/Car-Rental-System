@@ -1,12 +1,15 @@
 package com.CarRentalSystem.BookingService.Service;
 
+import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import com.CarRentalSystem.BookingService.Models.BookingStatus;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +54,17 @@ public class Validation {
                 return false;
             }
         }
-        
         return true;
+    }
+    public boolean isVehicleBooked(String vehicleId, LocalDate fromDate, LocalDate toDate) {
+        boolean exists = bookingRepository
+                .existsByVehicleIdAndStatusAndFromDateLessThanEqualAndEndDateGreaterThanEqual(
+                        vehicleId,
+                        BookingStatus.CONFIRMED,
+                        toDate,
+                        fromDate
+                );
+
+        return !exists;
     }
 }

@@ -3,11 +3,14 @@ package com.CarRentalSystem.BookingService.Controller;
 import com.CarRentalSystem.BookingService.Dto.BookingByIdResponse;
 import com.CarRentalSystem.BookingService.Dto.BookingRequestDto;
 import com.CarRentalSystem.BookingService.Dto.BookingResponseDto;
+import com.CarRentalSystem.BookingService.Dto.RequestId;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/booking")
@@ -28,12 +31,12 @@ public class BookingController {
         return bookingService.confirmBooking(bookingId);
     }
     @PutMapping("/cancel")
-    public Booking cancelBooking(@RequestBody String bookingId)
+    public Booking cancelBooking(@RequestBody RequestId bookingId)
     {
         return bookingService.cancelBooking(bookingId);
     }
     @GetMapping("/my")
-    public BookingByIdResponse getBooking(@RequestHeader("X-User-Id") String userId)
+    public List<BookingByIdResponse> getBooking(@RequestHeader("X-User-Id") String userId)
     {
         return bookingService.getBooking(userId);
     }

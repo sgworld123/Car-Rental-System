@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class BookingByIdResponse {
+    private String bookingId;
     private String vehicleId;
     private double cost;
     private LocalDate fromDate;
