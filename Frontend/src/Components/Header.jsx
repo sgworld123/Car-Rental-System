@@ -29,7 +29,7 @@ const Header = () => {
       display: 'flex',
       justifyContent: 'center',
       gap: '20px',
-      minWidth: 0, // 🔥 prevents overflow
+      minWidth: 0,
     },
 
     right: {
@@ -47,17 +47,17 @@ const Header = () => {
       letterSpacing: '1px',
     },
 
-    navButton: {
-      background: 'transparent',
-      border: 'none',
-      color: '#e0e0e0',
-      fontSize: '16px',
-      cursor: 'pointer',
-      padding: '8px 12px',
-      borderRadius: '4px',
-      transition: 'background-color 0.2s, color 0.2s',
-      whiteSpace: 'nowrap',
-    },
+    // navButton: {
+    //   background: 'transparent',
+    //   border: 'none',
+    //   color: '#e0e0e0',
+    //   fontSize: '16px',
+    //   cursor: 'pointer',
+    //   padding: '8px 12px',
+    //   borderRadius: '4px',
+    //   transition: 'background-color 0.2s, color 0.2s',
+    //   whiteSpace: 'nowrap',
+    // },
 
     themeButton: {
       padding: '8px 16px',
@@ -74,36 +74,63 @@ const Header = () => {
     },
   };
 
-  const handleMouseEnter = (e) => {
-    e.target.style.backgroundColor = '#333';
-    e.target.style.color = '#fff';
-  };
-
-  const handleMouseLeave = (e) => {
-    e.target.style.backgroundColor = 'transparent';
-    e.target.style.color = '#e0e0e0';
-  };
-
   return (
     <header style={styles.header}>
       <div style={styles.left}>
         <div style={styles.logo}>MY LOGO</div>
       </div>
 
-      <nav style={styles.center}>
-        <NavLink to={"/dashboard"} style={styles.navButton}  onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <nav className="flex gap-6 items-center">
+        <NavLink
+          to="/dashboard"
+          end
+          className={({ isActive }) =>
+            `px-4 py-2 rounded-md transition-all duration-200
+            ${isActive
+              ? "bg-purple-600 text-white shadow-md"
+              : "text-white hover:bg-purple-500/30"}`
+          }
+        >
           Home
         </NavLink>
-        <NavLink to={"/dashboard/bookings"} style={styles.navButton} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+
+        <NavLink
+          to="/dashboard/bookings"
+          className={({ isActive }) =>
+            `px-4 py-2 rounded-md transition-all duration-200
+            ${isActive
+              ? "bg-purple-600 text-white shadow-md"
+              : "text-white hover:bg-purple-500/30"}`
+          }
+        >
           Bookings
         </NavLink>
-        <NavLink to={"/profile"} style={styles.navButton} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+
+        <NavLink
+          to="/dashboard/profile"
+          className={({ isActive }) =>
+            `px-4 py-2 rounded-md transition-all duration-200
+            ${isActive
+              ? "bg-purple-600 text-white shadow-md"
+              : "text-white hover:bg-purple-500/30"}`
+          }
+        >
           Profile
         </NavLink>
-        <NavLink to={"/settings"} style={styles.navButton} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+
+        <NavLink
+          to="/dashboard/settings"
+          className={({ isActive }) =>
+            `px-4 py-2 rounded-md transition-all duration-200
+              ${isActive
+              ? "bg-purple-600 text-white shadow-md"
+              : "text-white hover:bg-purple-500/30"}`
+          }
+        >
           Settings
         </NavLink>
       </nav>
+
 
       <div style={styles.right}>
         <button style={styles.themeButton}>

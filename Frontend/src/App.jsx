@@ -8,6 +8,8 @@ import AgencyPage from './Pages/AgencyPage'
 import { ConfirmBooking } from './Pages/ConfirmBooking'
 import VehicleDetails from './Pages/VehicleDetails'
 import MyBookings from './Pages/MyBookings'
+import Profile from './Pages/Profile'
+import Settings from './Pages/Settings'
 function App() {
   return (
       <Routes>
@@ -15,8 +17,9 @@ function App() {
         <Route path='/register' element={<Register />} />
         <Route path='/dashboard' element={<DashBoardLayout />}>
           <Route index element={<Home />} />
-          <Route path="profile" element={<div>Profile Page</div>} />
           <Route path="bookings" element={<MyBookings />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="profile" element={<Profile />} />
         </Route>  
         <Route path="/agency/:id" element={<AgencyPage />} />
         <Route path="/vehicle-details/:vehicleId" element={<VehicleDetails />} />
