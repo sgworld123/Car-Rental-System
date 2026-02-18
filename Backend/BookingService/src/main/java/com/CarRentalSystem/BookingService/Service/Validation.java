@@ -1,6 +1,5 @@
 package com.CarRentalSystem.BookingService.Service;
 
-import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -9,7 +8,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.CarRentalSystem.BookingService.Models.BookingStatus;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -64,7 +62,6 @@ public class Validation {
                         toDate,
                         fromDate
                 );
-
         return !exists;
     }
 }

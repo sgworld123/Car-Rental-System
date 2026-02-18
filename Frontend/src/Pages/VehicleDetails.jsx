@@ -9,8 +9,9 @@ const VehicleDetails = () => {
     const navigate = useNavigate();
 
     const [showModal, setShowModal] = useState(false);
+    const [currentImage, setCurrentImage] = useState(0);
 
-    const[bookingLoading,setBookingLoading] = useState(false);
+    const [bookingLoading, setBookingLoading] = useState(false);
 
     const { vehicle, loading, error, fetchVehicle } = useVehicleById(vehicleId);
 
@@ -38,16 +39,17 @@ const VehicleDetails = () => {
             fromDate,
             toDate
         };
-        try{
+        try {
             setBookingLoading(true);
             await handleCreateBooking(payload);
             setBookingLoading(false);
             setShowModal(false);
             navigate("/dashboard/bookings");
         }
-        catch(error){
+        catch (error) {
             console.error("Booking failed:", error);
-            alert("Failed to create booking. Please try again.");}
+            alert("Failed to create booking. Please try again.");
+        }
     }
 
     const days =
@@ -58,49 +60,310 @@ const VehicleDetails = () => {
     const totalPrice = vehicle && days > 0 ? vehicle.pricePerKm * days : 0;
 
     return (
-        <div style={page}>
-            {loading && <p style={{ color: "#aaa" }}>Loading...</p>}
-            {error && <p style={{ color: "red" }}>{error}</p>}
+        <div style={{ background: "#0f0f0f", minHeight: "100vh", padding: "40px 0" }}>
 
-            {vehicle && (
-                <div style={card}>
-                    <h1 style={title}>{vehicle.model}</h1>
+            {loading && <p style={{ color: "#aaa", textAlign: "center" }}>Loading...</p>}
+            {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 
-                    <div style={goldLine} />
+            {vehicle && (() => {
+                const images = vehicle.images?.length
+                    ? vehicle.images
+                    : [vehicle.coverImage];
 
-                    <p style={text}>Make: {vehicle.make}</p>
-                    <p style={text}>Year: {vehicle.year}</p>
-                    <p style={price}>₹{vehicle.pricePerKm} / km</p>
+                return (
+                    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
 
-                    <button style={bookBtn} onClick={handleBook}>
-                        Book Now
-                    </button>
-                </div>
-            )}
+                        {/* Slider */}
+                        <div style={{
+                            position: "relative",
+                            width: "100%",
+                            height: "380px",
+                            marginBottom: "24px"
+                        }}>
 
+                            <img
+                                src={images[currentImage]}
+                                alt="car"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    borderRadius: "20px"
+                                }}
+                            />
+
+                            {/* Left */}
+                            <button
+                                onClick={() =>
+                                    setCurrentImage(currentImage === 0 ? images.length - 1 : currentImage - 1)
+                                }
+                                style={{
+                                    position: "absolute",
+                                    top: "50%",
+                                    left: "15px",
+                                    transform: "translateY(-50%)",
+                                    background: "rgba(0,0,0,.6)",
+                                    border: "none",
+                                    color: "#fff",
+                                    fontSize: "22px",
+                                    padding: "8px 12px",
+                                    borderRadius: "8px",
+                                    cursor: "pointer"
+                                }}
+                            >
+                                ‹
+                            </button>
+
+                            {/* Right */}
+                            <button
+                                onClick={() =>
+                                    setCurrentImage(currentImage === images.length - 1 ? 0 : currentImage + 1)
+                                }
+                                style={{
+                                    position: "absolute",
+                                    top: "50%",
+                                    right: "15px",
+                                    transform: "translateY(-50%)",
+                                    background: "rgba(0,0,0,.6)",
+                                    border: "none",
+                                    color: "#fff",
+                                    fontSize: "22px",
+                                    padding: "8px 12px",
+                                    borderRadius: "8px",
+                                    cursor: "pointer"
+                                }}
+                            >
+                                ›
+                            </button>
+
+                            {/* Dots */}
+                            <div style={{
+                                position: "absolute",
+                                bottom: "12px",
+                                left: "50%",
+                                transform: "translateX(-50%)",
+                                display: "flex",
+                                gap: "6px"
+                            }}>
+                                {images.map((_, i) => (
+                                    <div
+                                        key={i}
+                                        onClick={() => setCurrentImage(i)}
+                                        style={{
+                                            width: "8px",
+                                            height: "8px",
+                                            borderRadius: "50%",
+                                            background: currentImage === i ? "#b57cff" : "#666",
+                                            cursor: "pointer"
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "30px" }}>
+
+                            {/* Left */}
+                            <div>
+                                <h1 style={{ color: "#fff", marginBottom: "10px" }}>
+                                    {vehicle.carModel}
+                                </h1>
+
+                                <p style={{ color: "#aaa", marginBottom: "20px" }}>
+                                    {vehicle.description}
+                                </p>
+
+                                <h2 style={{ color: "#fff", marginBottom: "12px" }}>Reviews</h2>
+
+                                {vehicle.reviews?.length ? vehicle.reviews.map((r, i) => (
+                                    <div key={i} style={{
+                                        background: "#1a1a1a",
+                                        padding: "14px",
+                                        borderRadius: "12px",
+                                        marginBottom: "10px",
+                                        border: "1px solid #2a2a2a"
+                                    }}>
+                                        <div style={{ color: "#b57cff" }}>⭐ {r.rating}</div>
+                                        <p style={{ color: "#ddd", fontSize: "14px" }}>{r.reviewText}</p>
+                                        <span style={{ color: "#777", fontSize: "12px" }}>{r.userId}</span>
+                                    </div>
+                                )) : (
+                                    <p style={{ color: "#777" }}>No reviews yet.</p>
+                                )}
+                            </div>
+
+                            {/* Booking Card */}
+                            <div style={{
+                                background: "#1a1a1a",
+                                borderRadius: "18px",
+                                padding: "20px",
+                                border: "1px solid #2a2a2a",
+                                height: "fit-content"
+                            }}>
+                                <h2 style={{ color: "#fff", marginBottom: "12px" }}>
+                                    ₹ {vehicle.pricePerKm} / km
+                                </h2>
+
+                                <p style={{ color: "#aaa", marginBottom: "20px" }}>
+                                    Driver: {vehicle.driverName}
+                                </p>
+
+                                <button
+                                    onClick={handleBook}
+                                    style={{
+                                        width: "100%",
+                                        padding: "12px",
+                                        borderRadius: "10px",
+                                        border: "none",
+                                        background: "linear-gradient(135deg,#6d28d9,#9333ea)",
+                                        color: "#fff",
+                                        cursor: "pointer"
+                                    }}
+                                >
+                                    Book Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
+
+            {/* Modal */}
             {showModal && vehicle && (
-                <div style={overlay}>
-                    <div style={modal}>
+                <div style={{
+                    position: "fixed",
+                    inset: 0,
+                    background: "rgba(0,0,0,.75)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        background: "#141414",
+                        padding: "24px",
+                        borderRadius: "20px",
+                        width: "380px",
+                        border: "1px solid #2a2a2a",
+                        position: "relative"
+                    }}>
 
-                        {/* X Close */}
-                        <span style={closeBtn} onClick={() => setShowModal(false)}>✕</span>
+                        {/* Close */}
+                        <span
+                            onClick={() => setShowModal(false)}
+                            style={{
+                                position: "absolute",
+                                top: "14px",
+                                right: "16px",
+                                color: "#aaa",
+                                cursor: "pointer",
+                                fontSize: "18px"
+                            }}
+                        >
+                            ✕
+                        </span>
 
-                        <h2 style={modalTitle}>Booking Summary</h2>
+                        <h3 style={{ color: "#fff", marginBottom: "14px" }}>
+                            Confirm Booking
+                        </h3>
 
-                        <div style={goldLine} />
+                        {/* Vehicle Preview */}
+                        <div style={{
+                            display: "flex",
+                            gap: "12px",
+                            marginBottom: "16px"
+                        }}>
+                            <img
+                                src={vehicle.coverImage}
+                                alt={vehicle.carModel}
+                                style={{
+                                    width: "80px",
+                                    height: "80px",
+                                    borderRadius: "12px",
+                                    objectFit: "cover"
+                                }}
+                            />
 
-                        <p style={modalText}>From: {fromDate}</p>
-                        <p style={modalText}>To: {toDate}</p>
-                        <p style={modalText}>Days: {days}</p>
+                            <div>
+                                <div style={{ color: "#fff", fontWeight: "500" }}>
+                                    {vehicle.carModel}
+                                </div>
 
-                        <h3 style={total}>₹{totalPrice}</h3>
+                                <div style={{ color: "#aaa", fontSize: "13px" }}>
+                                    Driver: {vehicle.driverName}
+                                </div>
 
-                        <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-                            <button style={cancelBtn} onClick={() => setShowModal(false)}>
+                                <div style={{ color: "#b57cff", fontSize: "13px", marginTop: "4px" }}>
+                                    ₹ {vehicle.pricePerKm} / km
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Booking Info */}
+                        <div style={{
+                            background: "#1f1f1f",
+                            borderRadius: "12px",
+                            padding: "12px",
+                            marginBottom: "14px",
+                            border: "1px solid #2a2a2a"
+                        }}>
+                            <div style={{ color: "#bbb", fontSize: "13px" }}>
+                                📅 {fromDate} → {toDate}
+                            </div>
+
+                            <div style={{ color: "#aaa", fontSize: "13px", marginTop: "6px" }}>
+                                Duration: {days} days
+                            </div>
+                        </div>
+
+                        {/* Total */}
+                        <div style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: "18px"
+                        }}>
+                            <span style={{ color: "#aaa" }}>Total</span>
+
+                            <span style={{
+                                color: "#b57cff",
+                                fontSize: "22px",
+                                fontWeight: "600"
+                            }}>
+                                ₹{totalPrice}
+                            </span>
+                        </div>
+
+                        {/* Actions */}
+                        <div style={{ display: "flex", gap: "10px" }}>
+                            <button
+                                onClick={() => setShowModal(false)}
+                                style={{
+                                    flex: 1,
+                                    padding: "10px",
+                                    background: "#2f2f2f",
+                                    color: "#fff",
+                                    borderRadius: "10px",
+                                    border: "none",
+                                    cursor: "pointer"
+                                }}
+                            >
                                 Cancel
                             </button>
 
-                            <button style={confirmBtn} disabled={bookingLoading} onClick={confirmBooking}>
+                            <button
+                                onClick={confirmBooking}
+                                disabled={bookingLoading}
+                                style={{
+                                    flex: 1,
+                                    padding: "10px",
+                                    background: "linear-gradient(135deg,#6d28d9,#9333ea)",
+                                    color: "#fff",
+                                    borderRadius: "10px",
+                                    border: "none",
+                                    cursor: "pointer"
+                                }}
+                            >
                                 {bookingLoading ? "Booking..." : "Confirm"}
                             </button>
                         </div>
@@ -110,116 +373,7 @@ const VehicleDetails = () => {
             )}
         </div>
     );
-};
 
-const page = {
-    minHeight: "100vh",
-    background: "#0b0b0b",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-};
 
-const card = {
-    background: "#141414",
-    padding: 40,
-    borderRadius: 16,
-    width: 400,
-    boxShadow: "0 0 40px rgba(128,0,255,0.15)",
 };
-
-const title = {
-    color: "#fff",
-    marginBottom: 10,
-};
-
-const text = {
-    color: "#aaa",
-    marginTop: 8,
-};
-
-const price = {
-    color: "#c084fc",
-    fontSize: 20,
-    marginTop: 15,
-};
-
-const bookBtn = {
-    marginTop: 30,
-    width: "100%",
-    padding: 12,
-    background: "#7c3aed",
-    border: "none",
-    borderRadius: 8,
-    color: "#fff",
-    cursor: "pointer",
-    fontWeight: 600,
-};
-
-const goldLine = {
-    height: 2,
-    background: "linear-gradient(90deg, gold, transparent)",
-    margin: "15px 0",
-};
-
-const overlay = {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.7)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-};
-
-const modal = {
-    background: "#111",
-    color: "#fff",
-    padding: 30,
-    borderRadius: 14,
-    width: 350,
-    position: "relative",
-    border: "1px solid #333",
-};
-
-const closeBtn = {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    cursor: "pointer",
-    color: "#aaa",
-    fontSize: 18,
-};
-
-const modalTitle = {
-    marginBottom: 10,
-};
-
-const modalText = {
-    color: "#bbb",
-    marginTop: 8,
-};
-
-const total = {
-    marginTop: 15,
-    color: "gold",
-};
-
-const cancelBtn = {
-    flex: 1,
-    padding: 10,
-    background: "#222",
-    border: "1px solid #444",
-    color: "#fff",
-    borderRadius: 6,
-};
-
-const confirmBtn = {
-    flex: 1,
-    padding: 10,
-    background: "#7c3aed",
-    border: "none",
-    color: "#fff",
-    borderRadius: 6,
-};
-
 export default VehicleDetails;

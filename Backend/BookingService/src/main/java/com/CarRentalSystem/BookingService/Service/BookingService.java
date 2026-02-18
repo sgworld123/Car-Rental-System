@@ -34,7 +34,7 @@ public class BookingService {
                 bookingRequestDto.getVehicleId(),
                 bookingRequestDto.getFromDate(),
                 bookingRequestDto.getToDate()
-        ) && !validation.isVehicleBooked(
+        ) && validation.isVehicleBooked(
                 bookingRequestDto.getVehicleId(),
                 bookingRequestDto.getFromDate(),
                 bookingRequestDto.getToDate());

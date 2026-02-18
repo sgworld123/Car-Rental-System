@@ -7,13 +7,20 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Vehicle {
     private String vehicleId;
+    private String carNumber;
+    private String driverName;
     private ModelType carModel;
+    private String description;
     private float pricePerKm;
-    private String rating;
+    private List<Reviews> reviews;
+    private String coverImage;
+    private List<String> images;
 }

@@ -206,127 +206,105 @@ const Home = () => {
               key={index}
               className="agency-card"
               style={{
-                background: '#2a2a2a',
-                border: '1px solid #3a3a3a',
-                borderRadius: '12px',
-                padding: '20px 24px 20px 24px',
-                marginBottom: '16px',
-                transition: 'all 0.3s ease',
-                cursor: 'pointer',
-                position: 'relative'
+                background: "#1f1f1f",
+                border: "1px solid #2f2f2f",
+                borderRadius: "16px",
+                padding: "20px",
+                marginBottom: "18px",
+                transition: "all 0.3s ease",
+                cursor: "pointer",
+                display: "flex",
+                gap: "20px",
+                alignItems: "center"
               }}
               onClick={() => {
-                console.log("Navigating to agency details for ID:", agency.id);
                 const { fromDate, toDate } = tripData;
-                navigate(
-                  `/agency/${agency.id}?from=${fromDate}&to=${toDate}`
-                );
+                navigate(`/agency/${agency.id}?from=${fromDate}&to=${toDate}`);
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#333333';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.5)';
-                e.currentTarget.style.borderColor = '#4a4a4a';
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.boxShadow =
+                  "0 15px 30px rgba(0,0,0,0.6)";
+                e.currentTarget.style.borderColor = "#3f3f3f";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#2a2a2a';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-                e.currentTarget.style.borderColor = '#3a3a3a';
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "none";
+                e.currentTarget.style.borderColor = "#2f2f2f";
               }}
             >
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '12px',
-                position: 'relative'
-              }}>
-                {/* Smaller icon */}
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  background: '#3a3a3a',
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  <span style={{ fontSize: '20px' }}>🏢</span>
-                </div>
-
-                {/* Compact content */}
-                <div style={{ flex: 1 }}>
-                  <h3 style={{
-                    margin: '0 0 8px 0',
-                    color: '#ffffff',
-                    fontSize: '20px',
-                    fontWeight: '600',
-                    lineHeight: '1.3'
-                  }}>
-                    {agency.name}
-                  </h3>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginBottom: '8px',
-                    color: '#b0b0b0',
-                    fontSize: '14px'
-                  }}>
-                    <span style={{ fontSize: '16px' }}>📍</span>
-                    <span>{agency.address}</span>
-                  </div>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginBottom: '8px',
-                    color: '#a0a0a0',
-                    fontSize: '14px'
-                  }}>
-                    <span style={{ fontSize: '16px' }}>📞</span>
-                    <span>{agency.phone}</span>
-                  </div>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    color: '#9a9a9a',
-                    fontSize: '14px'
-                  }}>
-                    <span style={{ fontSize: '16px' }}>✉️</span>
-                    <span>{agency.email}</span>
-                  </div>
-                </div>
-
-                {/* Compact button */}
-                <button style={{
-                  padding: '10px 15px',
-                  background: '#404040',
-                  color: '#ffffff',
-                  border: '1px solid #505050',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  whiteSpace: 'nowrap',
+              {/* Agency Image */}
+              <img
+                src={agency.agencyImage}
+                alt={agency.name}
+                style={{
+                  width: "90px",
+                  height: "90px",
+                  borderRadius: "14px",
+                  objectFit: "cover",
                   flexShrink: 0
                 }}
+              />
+
+              {/* Content Section */}
+              <div style={{ flex: 1 }}>
+                <h3
+                  style={{
+                    margin: "0 0 6px 0",
+                    color: "#ffffff",
+                    fontSize: "22px",
+                    fontWeight: "600"
+                  }}
+                >
+                  {agency.name}
+                </h3>
+
+                <p
+                  style={{
+                    margin: "0 0 10px 0",
+                    color: "#9a9a9a",
+                    fontSize: "14px"
+                  }}
+                >
+                  {agency.address}
+                </p>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "20px",
+                    alignItems: "center",
+                    fontSize: "14px",
+                    color: "#b0b0b0"
+                  }}
+                >
+                  <span>📞 {agency.phone}</span>
+                  <span>⭐ {agency.rating}</span>
+                </div>
+              </div>
+
+              {/* CTA Section */}
+              <div style={{ textAlign: "right" }}>
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(`mailto:${agency.email}`);
                   }}
+                  style={{
+                    padding: "10px 18px",
+                    background: "linear-gradient(135deg, #6d28d9, #9333ea)",
+                    border: "none",
+                    borderRadius: "10px",
+                    color: "white",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
                   onMouseEnter={(e) => {
-                    e.target.style.background = '#505050';
-                    e.target.style.transform = 'translateY(-1px)';
-                    e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.4)';
+                    e.target.style.transform = "translateY(-2px)";
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.background = '#404040';
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.transform = "translateY(0)";
                   }}
                 >
                   Contact
@@ -334,6 +312,7 @@ const Home = () => {
               </div>
             </div>
           ))
+
         )}
       </div>
 

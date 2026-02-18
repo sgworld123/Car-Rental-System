@@ -111,99 +111,158 @@ const AgencyPage = () => {
         }
     };
     return (
-        <div style={styles.page}>
-            <div style={styles.container}>
+  <div style={{ background: "#0f0f0f", minHeight: "100vh", padding: "40px 0" }}>
+    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
 
-                {loading ? (
-                    <p style={{ color: "#b57cff" }}>Loading agency details...</p>
-                ) : error ? (
-                    <p style={{ color: "#ff4c4c" }}>Error loading agency details</p>
-                ) : agency ? (
-                    <>
-                        {/* Agency Info Card */}
-                        <div style={styles.card}>
-                            <h1 style={styles.title}>{agency.name}</h1>
+      {loading ? (
+        <p style={{ color: "#b57cff" }}>Loading agency...</p>
+      ) : error ? (
+        <p style={{ color: "#ff4c4c" }}>Error loading agency</p>
+      ) : agency && (
+        <>
+          {/* Agency Header */}
+          <div style={{
+            display: "flex",
+            gap: "24px",
+            marginBottom: "32px",
+            background: "#1a1a1a",
+            borderRadius: "20px",
+            padding: "24px",
+            border: "1px solid #2a2a2a"
+          }}>
+            <img
+              src={agency.agencyImage}
+              alt={agency.name}
+              style={{
+                width: "150px",
+                height: "150px",
+                borderRadius: "18px",
+                objectFit: "cover"
+              }}
+            />
 
-                            <div style={styles.grid}>
-                                <div style={styles.field}>
-                                    <div style={styles.label}>Email</div>
-                                    <div style={styles.value}>{agency.email}</div>
-                                </div>
+            <div style={{ flex: 1 }}>
+              <h1 style={{ color: "#fff", marginBottom: "6px" }}>{agency.name}</h1>
 
-                                <div style={styles.field}>
-                                    <div style={styles.label}>Phone</div>
-                                    <div style={styles.value}>{agency.phone}</div>
-                                </div>
+              <p style={{ color: "#aaa", marginBottom: "10px" }}>
+                {agency.details}
+              </p>
 
-                                <div style={styles.field}>
-                                    <div style={styles.label}>Source City</div>
-                                    <div style={styles.value}>{agency.sourceCity}</div>
-                                </div>
-
-                                <div style={styles.field}>
-                                    <div style={styles.label}>Address</div>
-                                    <div style={styles.value}>{agency.address}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Vehicles Section */}
-                        <div>
-                            <h2 style={styles.vehicleSectionTitle}>Available Vehicles</h2>
-
-                            <div style={styles.vehicleGrid}>
-                                {agency.vehicleInfo?.length > 0 ? (
-                                    agency.vehicleInfo.map((vehicle) => (
-                                        <div
-                                            key={vehicle.vehicleId}
-                                            style={styles.vehicleCard}
-                                            onMouseEnter={(e) =>
-                                            (e.currentTarget.style.boxShadow =
-                                                "0 0 20px rgba(181,124,255,0.4)")
-                                            }
-                                            onMouseLeave={(e) =>
-                                                (e.currentTarget.style.boxShadow = "none")
-                                            }
-                                        >
-                                            <h3 style={{ color: "#b57cff", marginBottom: "10px" }}>
-                                                {vehicle.carModel} Car
-                                            </h3>
-
-                                            <button
-                                                style={styles.rentButton}
-                                                onClick={() => navigate(`/vehicle-details/${vehicle.vehicleId}?from=${fromDate}&to=${toDate}`)}
-                                            >
-                                                Book Now
-                                            </button>
-                                            <div style={styles.vehicleDetail}>
-                                                <span style={styles.vehicleLabel}>Vehicle ID:</span>{" "}
-                                                {vehicle.vehicleId}
-                                            </div>
-
-                                            <div style={styles.vehicleDetail}>
-                                                <span style={styles.vehicleLabel}>Price per Km:</span>{" "}
-                                                ₹ {vehicle.pricePerKm}
-                                            </div>
-
-                                            <div style={styles.rating}>
-                                                ⭐ {vehicle.rating}
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p style={{ color: "#888" }}>No vehicles available.</p>
-                                )}
-                            </div>
-                        </div>
-                    </>
-                ) : (
-                    <p style={{ color: "#888" }}>No agency found.</p>
-                )}
-
+              <div style={{
+                display: "flex",
+                gap: "20px",
+                flexWrap: "wrap",
+                color: "#bbb",
+                fontSize: "14px"
+              }}>
+                <span>📍 {agency.address}</span>
+                <span>📞 {agency.phone}</span>
+                <span>✉️ {agency.email}</span>
+                <span>⭐ {agency.rating}</span>
+              </div>
             </div>
-        </div>
-    );
+          </div>
 
+          {/* Vehicles */}
+          <h2 style={{ color: "#fff", marginBottom: "16px" }}>Available Vehicles</h2>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))",
+            gap: "20px",
+            marginBottom: "40px"
+          }}>
+            {agency.vehicleInfo.map(vehicle => (
+              <div
+                key={vehicle.vehicleId}
+                style={{
+                  background: "#1a1a1a",
+                  borderRadius: "16px",
+                  overflow: "hidden",
+                  border: "1px solid #2a2a2a"
+                }}
+              >
+                <img
+                  src={vehicle.coverImage}
+                  alt={vehicle.carModel}
+                  style={{
+                    width: "100%",
+                    height: "160px",
+                    objectFit: "cover"
+                  }}
+                />
+
+                <div style={{ padding: "16px" }}>
+                  <h3 style={{ color: "#fff", marginBottom: "6px" }}>
+                    {vehicle.carModel}
+                  </h3>
+
+                  <p style={{ color: "#aaa", marginBottom: "10px" }}>
+                    ₹ {vehicle.pricePerKm} / km
+                  </p>
+
+                  <button
+                    onClick={() =>
+                      navigate(`/vehicle-details/${vehicle.vehicleId}?from=${fromDate}&to=${toDate}`)
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "10px",
+                      border: "none",
+                      background: "linear-gradient(135deg,#6d28d9,#9333ea)",
+                      color: "#fff",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Book Now
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Reviews */}
+          <h2 style={{ color: "#fff", marginBottom: "16px" }}>Customer Reviews</h2>
+
+          {agency.reviews?.length ? (
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))",
+              gap: "16px"
+            }}>
+              {agency.reviews.map((review, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    background: "#1a1a1a",
+                    borderRadius: "14px",
+                    padding: "16px",
+                    border: "1px solid #2a2a2a"
+                  }}
+                >
+                  <div style={{ color: "#b57cff", marginBottom: "6px" }}>
+                    ⭐ {review.rating}
+                  </div>
+
+                  <p style={{ color: "#ddd", fontSize: "14px" }}>
+                    {review.reviewText}
+                  </p>
+
+                  <div style={{ color: "#777", fontSize: "12px", marginTop: "8px" }}>
+                    User: {review.userId}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ color: "#888" }}>No reviews yet.</p>
+          )}
+        </>
+      )}
+    </div>
+  </div>
+);
 
 }
 export default AgencyPage;

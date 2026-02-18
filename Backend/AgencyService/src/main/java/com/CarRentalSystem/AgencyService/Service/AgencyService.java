@@ -6,15 +6,10 @@ import com.CarRentalSystem.AgencyService.Dto.AgencyResponseDto;
 import com.CarRentalSystem.AgencyService.Model.Agency;
 import com.CarRentalSystem.AgencyService.Model.Vehicle;
 import com.CarRentalSystem.AgencyService.Repository.AgencyRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -29,6 +24,10 @@ public class AgencyService {
         Agency agency = Agency.builder()
                 .name(agencyRegisterRequestDto.getName())
                 .address(agencyRegisterRequestDto.getAddress())
+                .details(agencyRegisterRequestDto.getDetails())
+                .rating(agencyRegisterRequestDto.getRating())
+                .agencyImage(agencyRegisterRequestDto.getAgencyImage())
+                .reviews(agencyRegisterRequestDto.getReviews())
                 .sourceCity(agencyRegisterRequestDto.getSourceCity())
                 .email(agencyRegisterRequestDto.getEmail())
                 .phone(agencyRegisterRequestDto.getPhone())
@@ -39,7 +38,12 @@ public class AgencyService {
                         .vehicleId("Veh" + (int)(Math.random() * 10000000))
                         .carModel(v.getCarModel())
                         .pricePerKm(v.getPricePerKm())
-                        .rating(v.getRating())
+                        .carNumber(v.getCarNumber())
+                        .description(v.getDescription())
+                        .driverName(v.getDriverName())
+                        .coverImage(v.getCoverImage())
+                        .images(v.getImages())
+                        .reviews(v.getReviews())
                         .build())
                 .toList();
         agency.setVehicleInfo(vehicles);
@@ -51,21 +55,28 @@ public class AgencyService {
                 .email(savedAgency.getEmail())
                 .name(savedAgency.getName())
                 .phone((savedAgency.getPhone()))
+                .agencyImage(savedAgency.getAgencyImage())
+                .reviews(savedAgency.getReviews())
+                .address(savedAgency.getAddress())
+                .rating(savedAgency.getRating())
+                .sourceCity(savedAgency.getSourceCity())
+                .vehicleInfo(savedAgency.getVehicleInfo())
+                .details(savedAgency.getDetails())
                 .build();
     }
 
-    //get agencies with source city
     public List<AgencySearchResponse> getAgenciesBySourceCity(String sourceCity) {
         List<Agency> agencies = agencyRepository.findBySourceCity(sourceCity);
         return agencies.stream().map(agency -> AgencySearchResponse.builder()
                 .id(agency.getId())
                 .name(agency.getName())
                 .email(agency.getEmail())
+                .agencyImage(agency.getAgencyImage())
+                .rating(agency.getRating())
                 .address(agency.getAddress())
                 .phone(agency.getPhone())
                 .build()).toList();
     }
-
     public AgencyResponseDto getAgencyById(String agencyId) {
         return agencyRepository.findById(agencyId)
                 .map(agency -> AgencyResponseDto.builder()
@@ -73,6 +84,10 @@ public class AgencyService {
                         .id(agency.getId())
                         .email(agency.getEmail())
                         .phone(agency.getPhone())
+                        .details(agency.getDetails())
+                        .agencyImage(agency.getAgencyImage())
+                        .rating(agency.getRating())
+                        .reviews(agency.getReviews())
                         .address(agency.getAddress())
                         .sourceCity(agency.getSourceCity())
                         .vehicleInfo(agency.getVehicleInfo())

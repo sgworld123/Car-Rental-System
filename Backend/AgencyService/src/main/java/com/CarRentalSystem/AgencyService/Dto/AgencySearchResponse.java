@@ -13,6 +13,8 @@ public class AgencySearchResponse {
     private String id;
     private String name;
     private String email;
+    private String agencyImage;
+    private String rating;
     private String address;
     private long phone;
 }

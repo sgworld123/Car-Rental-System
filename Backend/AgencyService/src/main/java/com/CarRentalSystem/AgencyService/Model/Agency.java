@@ -19,6 +19,10 @@ public class Agency {
     private String id;
     private String name;
     private String email;
+    private String details;
+    private String rating;
+    private List<Reviews> reviews;
+    private String agencyImage;
     private long phone;
     private String address;
     private String sourceCity;
