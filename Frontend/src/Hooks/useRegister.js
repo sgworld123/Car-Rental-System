@@ -10,7 +10,9 @@ export function useRegister()
         setError(null)
         try{
             console.log("calling backend to register user with data:", formData);
-            const response = await registerFun({username: formData.username, password: formData.password});
+            const response = await registerFun({username: formData.username, password: formData.password,
+                email:formData.email,phone:formData.phone
+            });
             return true;
         }
         catch(err){

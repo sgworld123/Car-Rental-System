@@ -8,6 +8,7 @@ const SignUpPage = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    phone: '',
     username: '',
     password: '',
     confirmPassword: ''
@@ -29,10 +30,10 @@ const SignUpPage = () => {
     }
     console.log('Registering user:', formData);
     const success = await register(formData);
-    if(success){
+    if (success) {
       navigate('/');
     }
-    else{
+    else {
       alert(error || "Registration failed. Please try again.");
     }
   };
@@ -123,7 +124,7 @@ const SignUpPage = () => {
     <div style={styles.container}>
       <div style={styles.card}>
         <h2 style={styles.title}>Create Account</h2>
-        
+
         <form onSubmit={handleSignUp}>
           {/* Full Name */}
           <div style={styles.inputGroup}>
@@ -152,6 +153,22 @@ const SignUpPage = () => {
               required
             />
           </div>
+          <div style={styles.inputGroup}>
+            <label style={styles.label} htmlFor="phone">Phone No.</label>
+
+            <input
+              id="phone"
+              style={styles.input}
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="98xxxxxxxx"
+              required
+              maxLength={10}
+            />
+          </div>
+
 
           {/* Username */}
           <div style={styles.inputGroup}>
@@ -196,17 +213,17 @@ const SignUpPage = () => {
           </div>
 
           <div style={styles.buttonContainer}>
-            <button 
-              style={styles.signUpButton} 
+            <button
+              style={styles.signUpButton}
               type="submit"
               onMouseOver={(e) => e.target.style.backgroundColor = '#3700b3'}
               onMouseOut={(e) => e.target.style.backgroundColor = '#6200ea'}
             >
               Sign Up
             </button>
-            
-            <button 
-              style={styles.signInLink} 
+
+            <button
+              style={styles.signInLink}
               onClick={handleSignInRedirect}
             >
               Already have an account? Sign In

@@ -2,10 +2,12 @@ package com.UserService.demo.Security;
 
 import com.UserService.demo.Dto.LoginRequestDto;
 import com.UserService.demo.Dto.LoginResponseDto;
+import com.UserService.demo.Dto.SignupRequestDto;
 import com.UserService.demo.Dto.SignupResponseDto;
 import com.UserService.demo.Model.AuthUser;
 import com.UserService.demo.Model.User;
 import com.UserService.demo.Repository.AuthUserRepository;
+import com.UserService.demo.Repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class AuthService {
     private final AuthUtils authUtils;
     private final AuthUserRepository authUserRepository;
     public final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(),loginRequestDto.getPassword())
@@ -36,25 +40,38 @@ public class AuthService {
                 .build();
     }
 
-    public SignupResponseDto signup(LoginRequestDto signupRequestDto) {
-        AuthUser authUser = authUserRepository.findByUsername(signupRequestDto.getUsername()).orElse(null);
+    @Transactional
+    public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
 
-        if(authUser != null) throw new IllegalArgumentException("user already existes");
+        authUserRepository.findByUsername(signupRequestDto.getUsername())
+                .ifPresent(user -> {
+                    throw new RuntimeException("Username already taken");
+                });
 
-        authUser = authUserRepository.save(AuthUser.builder()
+        AuthUser authUser = AuthUser.builder()
                 .username(signupRequestDto.getUsername())
                 .password(passwordEncoder.encode(signupRequestDto.getPassword()))
                 .role("USER")
-                .build());
+                .build();
+        authUser = authUserRepository.save(authUser);
+
+        System.out.println(authUser.getId());
+
+        User user = User.builder()
+                .authId(authUser.getId())
+                .name(signupRequestDto.getUsername())
+                .phone(signupRequestDto.getPhone())
+                .email(signupRequestDto.getEmail())
+                .build();
+
+
+
+        userRepository.save(user);
 
         return SignupResponseDto.builder()
-                .username(authUser.getUsername())
                 .id(authUser.getId())
+                .username(authUser.getUsername())
                 .build();
     }
 
-//    public String getUserIdFromToken(String substring) {
-//        Claims claims = authUtils.extractClaims(substring);
-//        return claims.get("userId").toString();
-//    }
 }

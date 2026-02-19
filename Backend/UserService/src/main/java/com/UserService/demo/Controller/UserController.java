@@ -1,5 +1,6 @@
 package com.UserService.demo.Controller;
 
+import com.UserService.demo.Dto.ProfileDto;
 import com.UserService.demo.Dto.RequestDto;
 import com.UserService.demo.Dto.ResponseDto;
 import com.UserService.demo.Service.UserService;
@@ -16,5 +17,10 @@ public class UserController {
     public Boolean validateUser(@PathVariable String userId)
     {
         return userService.validateUser(userId);
+    }
+    @GetMapping("/profile")
+    public ProfileDto returnProfile(@RequestHeader("X-User-Id") String userId)
+    {
+        return userService.returnProfile(userId);
     }
 }

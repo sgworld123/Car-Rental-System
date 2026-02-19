@@ -2,6 +2,7 @@ package com.UserService.demo.Controller;
 
 import com.UserService.demo.Dto.LoginRequestDto;
 import com.UserService.demo.Dto.LoginResponseDto;
+import com.UserService.demo.Dto.SignupRequestDto;
 import com.UserService.demo.Dto.SignupResponseDto;
 import com.UserService.demo.Security.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +21,8 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(loginRequestDto));
     }
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponseDto> signup(@RequestBody LoginRequestDto loginRequestDto)
+    public ResponseEntity<SignupResponseDto> signup(@RequestBody SignupRequestDto signupRequestDto)
     {
-        return ResponseEntity.ok(authService.signup(loginRequestDto));
+        return ResponseEntity.ok(authService.signup(signupRequestDto));
     }
-//    @GetMapping("/getUidFromToken")
-//    public ResponseEntity<String> getUidFromToken(@RequestHeader("Authorization") String token)
-//    {
-//        return ResponseEntity.ok(authService.getUserIdFromToken(token.substring(7)));
-//    }
 }
