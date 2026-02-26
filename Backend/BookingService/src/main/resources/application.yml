@@ -2,11 +2,14 @@ spring:
   application:
     name: BOOKINGSERVICE
 
+  cache:
+    type: redis
+
   data:
     redis:
-      host: redis-11516.crce206.ap-south-1-1.ec2.cloud.redislabs.com
-      port: 11516
-      password: zMQMM2NnHRawsGEVBv1C4m95fBOzemFn
+      host: redis-11820.c12.us-east-1-4.ec2.cloud.redislabs.com
+      port: 11820
+      password: v9qLCQispgaIjurqYh7iii1tf34paxSM
 
 
     mongodb:

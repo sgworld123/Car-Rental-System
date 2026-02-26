@@ -36,10 +36,12 @@ const VehicleDetails = () => {
     const confirmBooking = async () => {
         const payload = {
             vehicleId,
+            cost,
             fromDate,
             toDate
         };
         try {
+            console.log(payload)
             setBookingLoading(true);
             await handleCreateBooking(payload);
             setBookingLoading(false);
@@ -57,7 +59,7 @@ const VehicleDetails = () => {
             ? Math.ceil((new Date(toDate) - new Date(fromDate)) / (1000 * 60 * 60 * 24))
             : 0;
 
-    const totalPrice = vehicle && days > 0 ? vehicle.pricePerKm * days : 0;
+    const cost = vehicle && days > 0 ? vehicle.pricePerKm * days : 0;
 
     return (
         <div style={{ background: "#0f0f0f", minHeight: "100vh", padding: "40px 0" }}>

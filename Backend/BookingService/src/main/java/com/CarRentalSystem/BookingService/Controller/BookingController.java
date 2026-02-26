@@ -6,6 +6,7 @@ import com.CarRentalSystem.BookingService.Dto.BookingResponseDto;
 import com.CarRentalSystem.BookingService.Dto.RequestId;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Service.BookingService;
+import com.CarRentalSystem.BookingService.Service.RedisTestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookingController {
 
-    @Autowired
     private final BookingService bookingService;
+    private final RedisTestService redisTestService;
     @PostMapping
     public BookingResponseDto createBooking(@RequestHeader("X-User-Id") String userId
             ,@RequestBody BookingRequestDto bookingRequestDto) {
@@ -39,5 +40,10 @@ public class BookingController {
     public List<BookingByIdResponse> getBooking(@RequestHeader("X-User-Id") String userId)
     {
         return bookingService.getBooking(userId);
+    }
+    @GetMapping("/test")
+    public String getConnection()
+    {
+        return redisTestService.test();
     }
 }
