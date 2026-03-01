@@ -23,7 +23,6 @@ public class BookingController {
     @PostMapping
     public BookingResponseDto createBooking(@RequestHeader("X-User-Id") String userId
             ,@RequestBody BookingRequestDto bookingRequestDto) {
-        System.out.println("USERID = " + userId);
         return bookingService.createBooking(userId,bookingRequestDto);
     }
     @PutMapping("/confirm/{bookingId}")
@@ -32,9 +31,9 @@ public class BookingController {
         return bookingService.confirmBooking(bookingId);
     }
     @PutMapping("/cancel")
-    public Booking cancelBooking(@RequestBody RequestId bookingId)
+    public Booking cancelBooking(@RequestHeader("X-User-Id") String userId,@RequestBody RequestId bookingId)
     {
-        return bookingService.cancelBooking(bookingId);
+        return bookingService.cancelBooking(userId,bookingId);
     }
     @GetMapping("/my")
     public List<BookingByIdResponse> getBooking(@RequestHeader("X-User-Id") String userId)

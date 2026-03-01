@@ -1,6 +1,6 @@
-package com.CarRenralSystem.Gateway.Filter;
+package com.CarRentalSystem.Gateway.Filter;
 
-import com.CarRenralSystem.Gateway.Utils.JwtUtils;
+import com.CarRentalSystem.Gateway.Utils.JwtUtils;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;

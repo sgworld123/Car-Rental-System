@@ -15,7 +15,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AgencyService {
-    @Autowired
     private AgencyRepository agencyRepository;
 
     //register agency
@@ -49,7 +48,6 @@ public class AgencyService {
         agency.setVehicleInfo(vehicles);
 
         Agency savedAgency = agencyRepository.save(agency);
-        System.out.println(savedAgency.getId());
 
         return AgencyResponseDto.builder()
                 .email(savedAgency.getEmail())

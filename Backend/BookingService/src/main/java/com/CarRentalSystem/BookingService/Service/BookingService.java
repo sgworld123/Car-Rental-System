@@ -10,6 +10,7 @@ import com.CarRentalSystem.BookingService.Models.BookingStatus;
 import com.CarRentalSystem.BookingService.Repository.BookedVehicleAndDatesRepository;
 import com.CarRentalSystem.BookingService.Repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class BookingService {
-    private final Validation validation;
     private final BookingRepository bookingRepository;
     private final BookedVehicleAndDatesRepository bookedVehicleAndDatesRepository;
     private final RedisTemplate redisTemplate;
@@ -80,7 +81,7 @@ public class BookingService {
         return BookingResponseDto.builder()
                 .BookingId(bookingId)
                 .bookingStatus(BookingStatus.PENDING.name())
-                .totlecost(getCost(bookingRequestDto))
+                .totlecost(booking.getCost())
                 .build();
     }
 
@@ -91,7 +92,7 @@ public class BookingService {
         }
         catch (Exception e)
         {
-            System.out.println("Error removing from BookedVehicleAndDates: " + e.getMessage());
+            log.error("Error while removing booked vehicle and dates for bookingId: " + bookingId, e);
         }
     }
 
@@ -138,13 +139,19 @@ public class BookingService {
                 .build();
     }
 
-    public Booking cancelBooking(RequestId boookingId) {
+    public Booking cancelBooking(String userId, RequestId boookingId) {
         String bookingId = boookingId.getBookingId();
-        System.out.println("Booking id recieved : " +boookingId);
         Booking booking = bookingRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
+        if(booking.getUserId() != userId)
+        {
+            throw new RuntimeException("Unauthorized cancellation attempt");
+        }
         if(booking.getStatus() == BookingStatus.CONFIRMED) {
-            throw new RuntimeException("CONFIRMED SEATES WILL NOT BE CANCELLED");
+            throw new RuntimeException("CONFIRMED BOOKINGS WILL NOT BE CANCELLED");
+        }
+        if(booking.getStatus() == BookingStatus.COMPLETED) {
+            throw new RuntimeException("BOOKING ALREADY COMPLETED");
         }
         booking.setStatus(BookingStatus.CANCELLED);
         booking.setUpdatedAt(java.time.LocalDate.now());

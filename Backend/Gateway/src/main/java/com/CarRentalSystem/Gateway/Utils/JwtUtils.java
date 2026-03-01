@@ -1,4 +1,4 @@
-package com.CarRenralSystem.Gateway.Utils;
+package com.CarRentalSystem.Gateway.Utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

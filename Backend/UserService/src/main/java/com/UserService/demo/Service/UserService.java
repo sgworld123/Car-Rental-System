@@ -14,8 +14,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public Boolean validateUser(String userId) {
         return userRepository.findById(userId).isPresent();

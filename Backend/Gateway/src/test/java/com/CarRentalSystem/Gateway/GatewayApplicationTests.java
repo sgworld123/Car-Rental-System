@@ -1,4 +1,4 @@
-package com.CarRenralSystem.Gateway;
+package com.CarRentalSystem.Gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

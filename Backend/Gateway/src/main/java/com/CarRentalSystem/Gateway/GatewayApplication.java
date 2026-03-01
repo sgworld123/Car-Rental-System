@@ -1,4 +1,4 @@
-package com.CarRenralSystem.Gateway;
+package com.CarRentalSystem.Gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
