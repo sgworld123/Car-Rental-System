@@ -11,7 +11,6 @@ spring:
       port: 11820
       password: v9qLCQispgaIjurqYh7iii1tf34paxSM
 
-
     mongodb:
       uri: mongodb+srv://Shreyansh:Pass123@cluster0.hlz9zmj.mongodb.net/CarRentalSystem
 

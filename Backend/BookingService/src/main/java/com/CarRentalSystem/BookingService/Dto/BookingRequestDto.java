@@ -1,6 +1,5 @@
 package com.CarRentalSystem.BookingService.Dto;
 
-import com.CarRentalSystem.BookingService.Utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

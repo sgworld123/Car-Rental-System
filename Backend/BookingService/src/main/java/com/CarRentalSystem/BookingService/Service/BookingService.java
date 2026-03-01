@@ -4,10 +4,11 @@ import com.CarRentalSystem.BookingService.Dto.BookingByIdResponse;
 import com.CarRentalSystem.BookingService.Dto.BookingRequestDto;
 import com.CarRentalSystem.BookingService.Dto.BookingResponseDto;
 import com.CarRentalSystem.BookingService.Dto.RequestId;
+import com.CarRentalSystem.BookingService.Models.BookedVehicleAndDates;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Models.BookingStatus;
+import com.CarRentalSystem.BookingService.Repository.BookedVehicleAndDatesRepository;
 import com.CarRentalSystem.BookingService.Repository.BookingRepository;
-import com.CarRentalSystem.BookingService.Utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,22 +27,11 @@ import java.util.concurrent.TimeUnit;
 public class BookingService {
     private final Validation validation;
     private final BookingRepository bookingRepository;
+    private final BookedVehicleAndDatesRepository bookedVehicleAndDatesRepository;
     private final RedisTemplate redisTemplate;
     @Transactional
     public BookingResponseDto createBooking(String userId ,BookingRequestDto bookingRequestDto)
     {
-        boolean isAvailable = validation.isVehicleAvailable(
-                bookingRequestDto.getVehicleId(),
-                bookingRequestDto.getFromDate(),
-                bookingRequestDto.getToDate()
-        ) && validation.isVehicleBooked(
-                bookingRequestDto.getVehicleId(),
-                bookingRequestDto.getFromDate(),
-                bookingRequestDto.getToDate());
-
-        if (!isAvailable) {
-            throw new RuntimeException("Vehicle is not available for the selected dates");
-        }
         String bookingId = UUID.randomUUID().toString();
 
         List<String> lockedKeys = new ArrayList<>();
@@ -59,16 +49,23 @@ public class BookingService {
                         15,
                         TimeUnit.MINUTES
                 );
-
                 if (Boolean.FALSE.equals(acquired)) {
                     throw new RuntimeException("Vehicle unavailable on " + date);
                 }
+                BookedVehicleAndDates bookedVehicleAndDates = BookedVehicleAndDates.builder()
+                        .bookingId(bookingId)
+                        .vehicleId(bookingRequestDto.getVehicleId())
+                        .date(date)
+                        .build();
+                bookedVehicleAndDatesRepository.save(bookedVehicleAndDates);
                 lockedKeys.add(key);
             }
         } catch (Exception e) {
-            redisTemplate.delete(lockedKeys); // rollback
+            redisTemplate.delete(lockedKeys);
+            removeFromBookedVehicleAndDates(bookingId);
             throw e;
         }
+
         Booking booking = Booking.builder()
                 .bookingId(bookingId)
                 .userId(userId)
@@ -85,6 +82,17 @@ public class BookingService {
                 .bookingStatus(BookingStatus.PENDING.name())
                 .totlecost(getCost(bookingRequestDto))
                 .build();
+    }
+
+    private void removeFromBookedVehicleAndDates(String bookingId) {
+        try
+        {
+            bookedVehicleAndDatesRepository.deleteByBookingId(bookingId);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error removing from BookedVehicleAndDates: " + e.getMessage());
+        }
     }
 
     public double getCost(BookingRequestDto bookingRequestDto)
@@ -141,6 +149,10 @@ public class BookingService {
         booking.setStatus(BookingStatus.CANCELLED);
         booking.setUpdatedAt(java.time.LocalDate.now());
 
+        removeFromBookedVehicleAndDates(bookingId);
+        for(LocalDate date = booking.getFromDate(); !date.isAfter(booking.getEndDate()); date = date.plusDays(1)) {
+            redisTemplate.delete("vehicle:hold:" + booking.getVehicleId() + ":" + date);
+        }
         return bookingRepository.save(booking);
     }
     @Scheduled(cron = "0 0 0 * * ?") // Runs daily at midnight
@@ -153,27 +165,26 @@ public class BookingService {
         bookings.forEach(booking -> {
             booking.setStatus(BookingStatus.COMPLETED);
             booking.setUpdatedAt(java.time.LocalDate.now());
+            bookedVehicleAndDatesRepository.deleteByBookingId(booking.getBookingId());
+
         });
+
         bookingRepository.saveAll(bookings);
     }
 
     public List<BookingByIdResponse> getBooking(String userId) {
-        List<Optional<Object>> bookings = bookingRepository.findByUserId(userId);
+        List<Booking> bookings = bookingRepository.findByUserId(userId);
         List<BookingByIdResponse> response = new ArrayList<>();
-        for(Optional<Object> booking : bookings)
+        for(Booking b : bookings)
         {
-            if(booking.isPresent())
-            {
-                Booking b = (Booking) booking.get();
-                response.add(BookingByIdResponse.builder()
-                        .bookingId(b.getBookingId())
-                        .vehicleId(b.getVehicleId())
-                        .cost(b.getCost())
-                        .fromDate(b.getFromDate())
-                        .endDate(b.getEndDate())
-                        .status(b.getStatus())
-                        .build());
-            }
+            response.add(BookingByIdResponse.builder()
+                    .bookingId(b.getBookingId())
+                    .vehicleId(b.getVehicleId())
+                    .cost(b.getCost())
+                    .fromDate(b.getFromDate())
+                    .endDate(b.getEndDate())
+                    .status(b.getStatus())
+                    .build());
         }
         return response;
     }
