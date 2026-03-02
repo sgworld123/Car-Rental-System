@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AgencyService {
-    private AgencyRepository agencyRepository;
+    private final AgencyRepository agencyRepository;
 
     //register agency
     public AgencyResponseDto registerAgency(AgencyRegisterRequestDto agencyRegisterRequestDto)

@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -143,7 +140,7 @@ public class BookingService {
         String bookingId = boookingId.getBookingId();
         Booking booking = bookingRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
-        if(booking.getUserId() != userId)
+        if(!Objects.equals(booking.getUserId(), userId))
         {
             throw new RuntimeException("Unauthorized cancellation attempt");
         }
