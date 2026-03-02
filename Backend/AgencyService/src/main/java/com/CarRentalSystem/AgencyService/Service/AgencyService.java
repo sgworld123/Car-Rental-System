@@ -92,11 +92,6 @@ public class AgencyService {
                         .build())
                 .orElseThrow(() -> new RuntimeException("Agency not found with id: " + agencyId));
     }
-    public List<Vehicle> getVehiclesByAgencyId(String agencyId) {
-        Agency agency = agencyRepository.findById(agencyId)
-                .orElseThrow(() -> new RuntimeException("Agency not found with id: " + agencyId));
-        return agency.getVehicleInfo();
-    }
 
     public boolean isAgencyValid(String agencyId) {
         return agencyRepository.existsById(agencyId);

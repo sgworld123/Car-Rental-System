@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: Gateway
+
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - ${FRONTEND_URL}
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+      routes:
+        - id: USERSERVICE
+          uri: lb://USERSERVICE
+          predicates:
+            - Path=/api/user/**
+        - id: AUTHSERVICE
+          uri: lb://USERSERVICE
+          predicates:
+            - Path=/api/auth/**
+
+        - id: AGENCYSERVICE
+          uri: lb://AGENCYSERVICE
+          predicates:
+            - Path=/api/agency/**
+        - id: BOOKINGSERVICE
+          uri: lb://BOOKINGSERVICE
+          predicates:
+            - Path=/api/booking/**
+server:
+  port: 8090
+
+eureka:
+  instance:
+    ip-address: 127.0.0.1
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
