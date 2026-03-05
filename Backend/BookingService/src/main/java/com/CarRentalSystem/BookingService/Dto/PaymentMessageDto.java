@@ -14,6 +14,6 @@ public class PaymentMessageDto {
     private String bookingId;
     private String userId;
     private double amount;
-    private BookingStatus bookingStatus;
+    private PaymentStatus paymentStatus;
 
 }

@@ -2,6 +2,10 @@ spring:
   application:
     name: PaymentService
 
+  data:
+    mongodb:
+      uri: mongodb+srv://Shreyansh:Pass123@cluster0.hlz9zmj.mongodb.net/CarRentalSystem
+
 server:
   port: 8085
 

@@ -1,9 +1,6 @@
 package com.CarRentalSystem.BookingService.Service;
 
-import com.CarRentalSystem.BookingService.Dto.BookingByIdResponse;
-import com.CarRentalSystem.BookingService.Dto.BookingRequestDto;
-import com.CarRentalSystem.BookingService.Dto.BookingResponseDto;
-import com.CarRentalSystem.BookingService.Dto.RequestId;
+import com.CarRentalSystem.BookingService.Dto.*;
 import com.CarRentalSystem.BookingService.Models.BookedVehicleAndDates;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Models.BookingStatus;
@@ -74,7 +71,6 @@ public class BookingService {
                 .status(BookingStatus.PENDING)
                 .build();
         bookingRepository.save(booking);
-        bookingMessageProducer.sendBookingMessage(booking);
         return BookingResponseDto.builder()
                 .BookingId(bookingId)
                 .bookingStatus(BookingStatus.PENDING.name())
@@ -107,6 +103,9 @@ public class BookingService {
             throw new RuntimeException("No such booking found");
         }
         Booking booking = Optionalbooking.get();
+
+
+        Payment payment = bookingMessageProducer.sendBookingMessage(booking);
 
         for (LocalDate date = booking.getFromDate();
              !date.isAfter(booking.getEndDate());

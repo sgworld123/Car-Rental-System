@@ -16,7 +16,7 @@ public class BookingMessageProducer {
                 .bookingId(booking.getBookingId())
                 .userId(booking.getUserId())
                 .amount(booking.getCost())
-                .bookingStatus(booking.getStatus())
+                .paymentStatus(null)
                 .build();
         rabbitTemplate.convertAndSend("bookingQueue", paymentMessageDto);
     }
