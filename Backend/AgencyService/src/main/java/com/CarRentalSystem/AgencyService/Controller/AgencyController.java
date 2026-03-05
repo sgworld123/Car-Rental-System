@@ -1,9 +1,6 @@
 package com.CarRentalSystem.AgencyService.Controller;
 
-import com.CarRentalSystem.AgencyService.Dto.AgencySearchResponse;
-import com.CarRentalSystem.AgencyService.Dto.AgencyRegisterRequestDto;
-import com.CarRentalSystem.AgencyService.Dto.AgencyResponseDto;
-import com.CarRentalSystem.AgencyService.Dto.SearchRequestDto;
+import com.CarRentalSystem.AgencyService.Dto.*;
 import com.CarRentalSystem.AgencyService.Model.Agency;
 import com.CarRentalSystem.AgencyService.Model.Vehicle;
 import com.CarRentalSystem.AgencyService.Service.AgencyService;
@@ -24,8 +21,8 @@ public class AgencyController {
         return agencyService.registerAgency(agencyRegisterRequestDto);
     }
     @PostMapping("/search")
-    public List<AgencySearchResponse> searchAgencies(@RequestBody SearchRequestDto searchRequestDto) {
-        return agencyService.getAgenciesBySourceCity(searchRequestDto.getSourceCity());
+    public PagedSearchResponse searchAgenciesBySourceCity(@RequestBody SearchRequestDto searchRequestDto) {
+        return agencyService.getAgenciesBySourceCity(searchRequestDto);
     }
     @GetMapping("/{agencyId}")
     public AgencyResponseDto getAgencyById(@PathVariable String agencyId)

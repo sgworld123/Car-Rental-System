@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Document(collection = "vehicleData")
 public class Vehicle {
     private String vehicleId;
     private String carNumber;

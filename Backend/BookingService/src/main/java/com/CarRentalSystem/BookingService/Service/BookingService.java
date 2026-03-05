@@ -26,7 +26,8 @@ import java.util.concurrent.TimeUnit;
 public class BookingService {
     private final BookingRepository bookingRepository;
     private final BookedVehicleAndDatesRepository bookedVehicleAndDatesRepository;
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String,String> redisTemplate;
+    private final BookingMessageProducer bookingMessageProducer;
     @Transactional
     public BookingResponseDto createBooking(String userId ,BookingRequestDto bookingRequestDto)
     {
@@ -38,14 +39,12 @@ public class BookingService {
                  !date.isAfter(bookingRequestDto.getToDate());
                  date = date.plusDays(1)) {
 
-                String key = "vehicle:hold:" +
+                String key =
                         bookingRequestDto.getVehicleId() + ":" + date;
 
                 Boolean acquired = redisTemplate.opsForValue().setIfAbsent(
                         key,
-                        bookingId,
-                        15,
-                        TimeUnit.MINUTES
+                        bookingId
                 );
                 if (Boolean.FALSE.equals(acquired)) {
                     throw new RuntimeException("Vehicle unavailable on " + date);
@@ -75,6 +74,7 @@ public class BookingService {
                 .status(BookingStatus.PENDING)
                 .build();
         bookingRepository.save(booking);
+        bookingMessageProducer.sendBookingMessage(booking);
         return BookingResponseDto.builder()
                 .BookingId(bookingId)
                 .bookingStatus(BookingStatus.PENDING.name())
@@ -102,7 +102,6 @@ public class BookingService {
     }
 
     public BookingResponseDto confirmBooking(String bookingId) {
-
         Optional<Booking> Optionalbooking =  bookingRepository.findByBookingId(bookingId);
         if(!Optionalbooking.isPresent()) {
             throw new RuntimeException("No such booking found");
@@ -113,7 +112,7 @@ public class BookingService {
              !date.isAfter(booking.getEndDate());
              date = date.plusDays(1)) {
 
-            String key = "vehicle:hold:" + booking.getVehicleId() + ":" + date;
+            String key = booking.getVehicleId() + ":" + date;
             String heldBookingId = (String) redisTemplate.opsForValue().get(key);
 
             if (!bookingId.equals(heldBookingId)) {
@@ -126,7 +125,7 @@ public class BookingService {
         bookingRepository.save(booking);
 
         for (LocalDate date = booking.getFromDate(); !date.isAfter(booking.getEndDate()); date = date.plusDays(1)) {
-            redisTemplate.delete("vehicle:hold:" + booking.getVehicleId() + ":" + date);
+            redisTemplate.delete( booking.getVehicleId() + ":" + date);
         }
 
         return BookingResponseDto.builder()
@@ -155,7 +154,7 @@ public class BookingService {
 
         removeFromBookedVehicleAndDates(bookingId);
         for(LocalDate date = booking.getFromDate(); !date.isAfter(booking.getEndDate()); date = date.plusDays(1)) {
-            redisTemplate.delete("vehicle:hold:" + booking.getVehicleId() + ":" + date);
+            redisTemplate.delete( booking.getVehicleId() + ":" + date);
         }
         return bookingRepository.save(booking);
     }

@@ -1,22 +1,26 @@
 package com.CarRentalSystem.AgencyService.Service;
 
-import com.CarRentalSystem.AgencyService.Dto.AgencySearchResponse;
-import com.CarRentalSystem.AgencyService.Dto.AgencyRegisterRequestDto;
-import com.CarRentalSystem.AgencyService.Dto.AgencyResponseDto;
+import com.CarRentalSystem.AgencyService.Dto.*;
 import com.CarRentalSystem.AgencyService.Model.Agency;
 import com.CarRentalSystem.AgencyService.Model.Vehicle;
 import com.CarRentalSystem.AgencyService.Repository.AgencyRepository;
+import com.CarRentalSystem.AgencyService.Repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AgencyService {
     private final AgencyRepository agencyRepository;
-
+    private final VehicleRepository vehicleRepository;
+    private final RedisTemplate<String,Object> redisTemplate;
     //register agency
     public AgencyResponseDto registerAgency(AgencyRegisterRequestDto agencyRegisterRequestDto)
     {
@@ -45,6 +49,7 @@ public class AgencyService {
                         .reviews(v.getReviews())
                         .build())
                 .toList();
+        vehicleRepository.saveAll(vehicles);
         agency.setVehicleInfo(vehicles);
 
         Agency savedAgency = agencyRepository.save(agency);
@@ -63,9 +68,16 @@ public class AgencyService {
                 .build();
     }
 
-    public List<AgencySearchResponse> getAgenciesBySourceCity(String sourceCity) {
-        List<Agency> agencies = agencyRepository.findBySourceCity(sourceCity);
-        return agencies.stream().map(agency -> AgencySearchResponse.builder()
+    public PagedSearchResponse getAgenciesBySourceCity(SearchRequestDto searchRequestDto) {
+        String key = searchRequestDto.getSourceCity() + "_" + searchRequestDto.getPageNumber();
+        PagedSearchResponse cachedResponse = (PagedSearchResponse) redisTemplate.opsForValue().get(key);
+        if (cachedResponse != null) {
+            return cachedResponse;
+        }
+        Pageable pageable = PageRequest.of(searchRequestDto.getPageNumber(), searchRequestDto.getPageSize());
+        Page<Agency> pageAgency = agencyRepository.findBySourceCity(searchRequestDto.getSourceCity(),pageable);
+        List<Agency> agencies = pageAgency.getContent();
+        List<AgencySearchResponse> agencyList = agencies.stream().map(agency -> AgencySearchResponse.builder()
                 .id(agency.getId())
                 .name(agency.getName())
                 .email(agency.getEmail())
@@ -74,6 +86,15 @@ public class AgencyService {
                 .address(agency.getAddress())
                 .phone(agency.getPhone())
                 .build()).toList();
+        PagedSearchResponse pagedSearchResponse = PagedSearchResponse.builder()
+                .agencies(agencyList)
+                .currentPage(pageAgency.getNumber())
+                .totalPages(pageAgency.getTotalPages())
+                .totleItems((int) pageAgency.getTotalElements())
+                .pageSize(pageAgency.getSize())
+                .build();
+        redisTemplate.opsForValue().set(searchRequestDto.getSourceCity() + "_" + searchRequestDto.getPageNumber(),pagedSearchResponse, Duration.ofMinutes(10));
+        return pagedSearchResponse;
     }
     public AgencyResponseDto getAgencyById(String agencyId) {
         return agencyRepository.findById(agencyId)

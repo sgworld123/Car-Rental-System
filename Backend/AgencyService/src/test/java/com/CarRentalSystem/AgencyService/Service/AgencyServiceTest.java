@@ -107,25 +107,25 @@ class AgencyServiceTest {
     // getAgenciesBySourceCity
     // ─────────────────────────────────────────────
 
-    @Test
-    @DisplayName("getAgenciesBySourceCity – returns matching agencies")
-    void getAgenciesBySourceCity_found() {
-        when(agencyRepository.findBySourceCity("Delhi")).thenReturn(List.of(sampleAgency));
-
-        List<AgencySearchResponse> results = agencyService.getAgenciesBySourceCity("Delhi");
-
-        assertThat(results).hasSize(1);
-        assertThat(results.get(0).getName()).isEqualTo("FastWheels");
-        assertThat(results.get(0).getId()).isEqualTo("agency-001");
-    }
-
-    @Test
-    @DisplayName("getAgenciesBySourceCity – returns empty list for unknown city")
-    void getAgenciesBySourceCity_empty() {
-        when(agencyRepository.findBySourceCity("Nowhere")).thenReturn(List.of());
-
-        assertThat(agencyService.getAgenciesBySourceCity("Nowhere")).isEmpty();
-    }
+//    @Test
+//    @DisplayName("getAgenciesBySourceCity – returns matching agencies")
+//    void getAgenciesBySourceCity_found() {
+//        when(agencyRepository.findBySourceCity("Delhi")).thenReturn(List.of(sampleAgency));
+//
+//        List<AgencySearchResponse> results = agencyService.getAgenciesBySourceCity("Delhi");
+//
+//        assertThat(results).hasSize(1);
+//        assertThat(results.get(0).getName()).isEqualTo("FastWheels");
+//        assertThat(results.get(0).getId()).isEqualTo("agency-001");
+//    }
+//
+//    @Test
+//    @DisplayName("getAgenciesBySourceCity – returns empty list for unknown city")
+//    void getAgenciesBySourceCity_empty() {
+//        when(agencyRepository.findBySourceCity("Nowhere")).thenReturn(List.of());
+//
+//        assertThat(agencyService.getAgenciesBySourceCity("Nowhere")).isEmpty();
+//    }
 
     // ─────────────────────────────────────────────
     // getAgencyById

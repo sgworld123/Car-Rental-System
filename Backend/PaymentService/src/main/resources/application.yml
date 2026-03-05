@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: PaymentService
+
+server:
+  port: 8085
+
+  #RabbitMq
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
