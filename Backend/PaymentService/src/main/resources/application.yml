@@ -4,14 +4,14 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb+srv://Shreyansh:Pass123@cluster0.hlz9zmj.mongodb.net/CarRentalSystem
+      uri: ${MONGO_URI}
 
   #RabbitMq
   rabbitmq:
     host: localhost
     port: 5672
-    username: guest
-    password: guest
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
 
 server:
   port: 8085
