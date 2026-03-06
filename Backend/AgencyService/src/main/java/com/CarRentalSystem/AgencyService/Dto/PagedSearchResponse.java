@@ -13,8 +13,8 @@ import java.util.List;
 @Builder
 public class PagedSearchResponse {
     private List<AgencySearchResponse> agencies;
-    int currentPage;
-    int totalPages;
-    int totleItems;
-    int pageSize;
+    private int currentPage;
+    private int totalPages;
+    private int totalItems;
+    private int pageSize;
 }

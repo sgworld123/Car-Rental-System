@@ -1,6 +1,7 @@
 package com.CarRentalSystem.BookingService.Service;
 
 import com.CarRentalSystem.BookingService.Config.BookingRabbitMQConfig;
+import com.CarRentalSystem.BookingService.Dto.BookingCancelledEvent;
 import com.CarRentalSystem.BookingService.Dto.BookingCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,15 +25,15 @@ public class BookingEventPublisher {
             log.error("Failed to publish booking created event for bookingId: {}. Error: {}", event.getBookingId(), e.getMessage());
         }
     }
-    public void handleBookingCancelled(String bookingId) {
+    public void handleBookingCancelled(BookingCancelledEvent bookingCancelledEvent) {
         try{
             rabbitTemplate.convertAndSend(BookingRabbitMQConfig.BOOKING_EXCHANGE
                     , BookingRabbitMQConfig.BOOKING_CANCELLED_KEY
-                    , bookingId);
-            log.info("Published booking cancelled event for bookingId: {}", bookingId);
+                    , bookingCancelledEvent);
+            log.info("Published booking cancelled event for bookingId: {}", bookingCancelledEvent);
         }
         catch (Exception e){
-            log.error("Failed to publish booking cancelled event for bookingId: {}. Error: {}", bookingId, e.getMessage());
+            log.error("Failed to publish booking cancelled event for bookingId: {}. Error: {}", bookingCancelledEvent, e.getMessage());
         }
     }
 }

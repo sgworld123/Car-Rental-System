@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingCancelledEvent {
-    private String transactionId;
+    private String bookingId;
+    private String userId;
     private String vehicleId;
     private double amount;
     private LocalDateTime cancelledAt;

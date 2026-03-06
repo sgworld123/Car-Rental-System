@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class BookingResponseDto {
-    private String BookingId;
+    private String bookingId;
     private String bookingStatus;
-    private double totlecost;
+    private double totalCost;
 }

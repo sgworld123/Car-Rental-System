@@ -73,9 +73,9 @@ public class BookingService {
                 .build();
         bookingRepository.save(booking);
         return BookingResponseDto.builder()
-                .BookingId(bookingId)
+                .bookingId(bookingId)
                 .bookingStatus(BookingStatus.PENDING.name())
-                .totlecost(booking.getCost())
+                .totalCost(booking.getCost())
                 .build();
     }
 
@@ -114,13 +114,12 @@ public class BookingService {
                     .amount(booking.getCost())
                     .build());
             return BookingResponseDto.builder()
-                    .BookingId(bookingId)
-                    .bookingStatus(BookingStatus.PENDING.name())
-                    .totlecost(booking.getCost())
+                    .bookingId(bookingId)
+                    .bookingStatus(BookingStatus.CONFIRMED.name())
+                    .totalCost(booking.getCost())
                     .build();
         }
     }
-
     public Booking cancelBooking(String userId, RequestId boookingId) {
         String bookingId = boookingId.getBookingId();
         Booking booking = bookingRepository.findByBookingId(bookingId)
@@ -135,8 +134,14 @@ public class BookingService {
         if(booking.getStatus() == BookingStatus.COMPLETED) {
             throw new RuntimeException("BOOKING ALREADY COMPLETED");
         }
-
-
+        bookedVehicleAndDatesRepository.deleteByBookingId(bookingId);
+        bookingEventPublisher.handleBookingCancelled(BookingCancelledEvent.builder()
+                .bookingId(booking.getBookingId())
+                .userId(booking.getUserId())
+                .amount(booking.getCost())
+                .build());
+        booking.setStatus(BookingStatus.CANCELLED);
+        booking.setUpdatedAt(LocalDate.now());
         return bookingRepository.save(booking);
     }
     @Scheduled(cron = "0 0 0 * * ?") // Runs daily at midnight

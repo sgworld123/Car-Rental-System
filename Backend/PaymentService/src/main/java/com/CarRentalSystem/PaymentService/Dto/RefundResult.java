@@ -1,19 +1,17 @@
 package com.CarRentalSystem.PaymentService.Dto;
 
+import com.CarRentalSystem.PaymentService.Models.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingCancelledEvent {
-    private String bookingId;
-    private String userId;
-    private String vehicleId;
+public class RefundResult {
+    private String refundId;
+    private PaymentStatus status;
     private double amount;
-    private LocalDateTime cancelledAt;
 }

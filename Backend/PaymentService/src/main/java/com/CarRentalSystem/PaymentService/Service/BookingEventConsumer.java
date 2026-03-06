@@ -1,6 +1,7 @@
 package com.CarRentalSystem.PaymentService.Service;
 
 import com.CarRentalSystem.PaymentService.Configs.BookingRabbitMQConfig;
+import com.CarRentalSystem.PaymentService.Dto.BookingCancelledEvent;
 import com.CarRentalSystem.PaymentService.Dto.BookingCreatedEvent;
 import com.CarRentalSystem.PaymentService.Dto.PaymentMessageDto;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,13 @@ public class BookingEventConsumer {
                 .build());
     }
     @RabbitListener(queues = BookingRabbitMQConfig.BOOKING_CANCELLED_QUEUE)
-    public void consumePaymentFailedMessage(BookingCreatedEvent paymentMessageDto) {
-        log.info("Received payment failed message for bookingId: {}", paymentMessageDto.getBookingId());
+    public void consumeBookingCancelled(BookingCancelledEvent bookingCancelledEvent) {
+        log.info("Cancelling booking for id : {}", bookingCancelledEvent.getBookingId());
         // Handle payment failure logic here, e.g., notify user, retry, etc.
+        paymentService.initiateRefund(PaymentMessageDto.builder()
+                .bookingId(bookingCancelledEvent.getBookingId())
+                .userId(bookingCancelledEvent.getUserId())
+                .amount(bookingCancelledEvent.getAmount())
+                .build());
     }
 }
