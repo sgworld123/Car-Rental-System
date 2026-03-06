@@ -90,7 +90,7 @@ public class AgencyService {
                 .agencies(agencyList)
                 .currentPage(pageAgency.getNumber())
                 .totalPages(pageAgency.getTotalPages())
-                .totleItems((int) pageAgency.getTotalElements())
+                .totalItems((int) pageAgency.getTotalElements())
                 .pageSize(pageAgency.getSize())
                 .build();
         redisTemplate.opsForValue().set(searchRequestDto.getSourceCity() + "_" + searchRequestDto.getPageNumber(),pagedSearchResponse, Duration.ofMinutes(10));

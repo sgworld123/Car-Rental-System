@@ -4,5 +4,7 @@ public enum PaymentStatus {
     SUCCESS,
     FAILURE,
     PENDING,
-    UNKNOWN_ERROR
+    UNKNOWN_ERROR,
+    REFUND_SUCCESS,
+    REFUND_FAILURE
 }

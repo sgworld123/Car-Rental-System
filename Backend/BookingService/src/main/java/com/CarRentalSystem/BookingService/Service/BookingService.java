@@ -128,9 +128,6 @@ public class BookingService {
         {
             throw new RuntimeException("Unauthorized cancellation attempt");
         }
-        if(booking.getStatus() == BookingStatus.CONFIRMED) {
-            throw new RuntimeException("CONFIRMED BOOKINGS WILL NOT BE CANCELLED");
-        }
         if(booking.getStatus() == BookingStatus.COMPLETED) {
             throw new RuntimeException("BOOKING ALREADY COMPLETED");
         }
