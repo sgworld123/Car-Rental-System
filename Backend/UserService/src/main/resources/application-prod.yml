@@ -4,7 +4,7 @@ spring:
 
   data:
     mongodb:
-      uri: ${USER_MONGODB_URI}
+      uri: ${MONGODB_URI}
 
 server:
   port: 8081

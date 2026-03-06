@@ -19,5 +19,4 @@ public class Payment {
     private PaymentStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }

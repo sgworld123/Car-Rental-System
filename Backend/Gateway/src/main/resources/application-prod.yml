@@ -27,7 +27,6 @@ spring:
           uri: lb://USERSERVICE
           predicates:
             - Path=/api/auth/**
-
         - id: AGENCYSERVICE
           uri: lb://AGENCYSERVICE
           predicates:
@@ -36,6 +35,11 @@ spring:
           uri: lb://BOOKINGSERVICE
           predicates:
               - Path=/api/booking/**
+        - id: PAYMENTSERVICE
+          uri: lb://PAYMENTSERVICE
+          predicates:
+            - Path=/api/payment/**
+
 server:
   port: 8090
 

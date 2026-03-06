@@ -1,4 +1,4 @@
-package com.CarRentalSystem.PaymentService.Dto;
+package com.CarRentalSystem.BookingService.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentSuccessEvent {
-    private String bookingId;
+public class BookingCancelledEvent {
     private String transactionId;
+    private String vehicleId;
     private double amount;
-    private LocalDateTime paidAt;
+    private LocalDateTime cancelledAt;
 }

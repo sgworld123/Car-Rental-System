@@ -1,4 +1,4 @@
-package com.CarRentalSystem.PaymentService.Dto;
+package com.CarRentalSystem.BookingService.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

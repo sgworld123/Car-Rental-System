@@ -2,6 +2,7 @@ package com.CarRentalSystem.PaymentService.Service;
 
 import com.CarRentalSystem.PaymentService.Dto.PaymentMessageDto;
 import com.CarRentalSystem.PaymentService.Dto.PaymentResult;
+import com.CarRentalSystem.PaymentService.Dto.PaymentSuccessEvent;
 import com.CarRentalSystem.PaymentService.Errors.Exceptions;
 import com.CarRentalSystem.PaymentService.Models.Payment;
 import com.CarRentalSystem.PaymentService.Models.PaymentStatus;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
+    private final PaymentEventPublisher paymentEventPublisher;
     public Payment processPayment(PaymentMessageDto paymentMessageDto) {
         Payment payment = Payment.builder()
                 .paymentId(UUID.randomUUID().toString())
@@ -26,12 +28,21 @@ public class PaymentService {
                 .status(PaymentStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
-        paymentRepository.save(payment);
         try{
             PaymentResult result = MockPaymentProvider.processPayment(paymentMessageDto.getAmount());
             if(result.getStatus() == PaymentStatus.SUCCESS) {
+                paymentEventPublisher.publishSuccess(PaymentSuccessEvent.builder()
+                        .bookingId(paymentMessageDto.getBookingId())
+                        .amount(paymentMessageDto.getAmount())
+                        .paidAt(LocalDateTime.now())
+                        .build());
                 payment.setStatus(PaymentStatus.SUCCESS);
             } else if(result.getStatus() == PaymentStatus.FAILURE) {
+                paymentEventPublisher.publishFailure(PaymentSuccessEvent.builder()
+                        .bookingId(paymentMessageDto.getBookingId())
+                        .amount(paymentMessageDto.getAmount())
+                        .paidAt(LocalDateTime.now())
+                        .build());
                 payment.setStatus(PaymentStatus.FAILURE);
             }
             else {

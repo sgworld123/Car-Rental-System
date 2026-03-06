@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RabbitMQConfig {
+public class PaymentRabbitMQConfig {
 
     // Exchange — the entry point, events are published here
     public static final String PAYMENT_EXCHANGE = "payment.exchange";

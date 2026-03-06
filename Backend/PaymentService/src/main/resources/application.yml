@@ -1,13 +1,10 @@
 spring:
   application:
-    name: PaymentService
+    name: PAYMENTSERVICE
 
   data:
     mongodb:
       uri: mongodb+srv://Shreyansh:Pass123@cluster0.hlz9zmj.mongodb.net/CarRentalSystem
-
-server:
-  port: 8085
 
   #RabbitMq
   rabbitmq:
@@ -15,3 +12,14 @@ server:
     port: 5672
     username: guest
     password: guest
+
+server:
+  port: 8085
+
+eureka:
+  instance:
+    ip-address: 127.0.0.1
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

@@ -13,9 +13,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -24,7 +24,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final BookedVehicleAndDatesRepository bookedVehicleAndDatesRepository;
     private final RedisTemplate<String,String> redisTemplate;
-    private final BookingMessageProducer bookingMessageProducer;
+    private final BookingEventPublisher bookingEventPublisher;
     @Transactional
     public BookingResponseDto createBooking(String userId ,BookingRequestDto bookingRequestDto)
     {
@@ -41,7 +41,8 @@ public class BookingService {
 
                 Boolean acquired = redisTemplate.opsForValue().setIfAbsent(
                         key,
-                        bookingId
+                        bookingId,
+                        Duration.ofMinutes(15)
                 );
                 if (Boolean.FALSE.equals(acquired)) {
                     throw new RuntimeException("Vehicle unavailable on " + date);
@@ -88,7 +89,6 @@ public class BookingService {
             log.error("Error while removing booked vehicle and dates for bookingId: " + bookingId, e);
         }
     }
-
     public double getCost(BookingRequestDto bookingRequestDto)
     {
         // Dummy implementation, replace with actual cost calculation logic
@@ -98,40 +98,27 @@ public class BookingService {
     }
 
     public BookingResponseDto confirmBooking(String bookingId) {
-        Optional<Booking> Optionalbooking =  bookingRepository.findByBookingId(bookingId);
-        if(!Optionalbooking.isPresent()) {
-            throw new RuntimeException("No such booking found");
+        Booking booking = bookingRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        if(booking.getStatus() == BookingStatus.CONFIRMED) {
+            throw new RuntimeException("BOOKING ALREADY CONFIRMED");
+        } else if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new RuntimeException("CANCELLED BOOKING CANNOT BE CONFIRMED");
+        } else if (booking.getStatus() == BookingStatus.COMPLETED) {
+            throw new RuntimeException("COMPLETED BOOKING CANNOT BE CONFIRMED");
         }
-        Booking booking = Optionalbooking.get();
-
-
-        Payment payment = bookingMessageProducer.sendBookingMessage(booking);
-
-        for (LocalDate date = booking.getFromDate();
-             !date.isAfter(booking.getEndDate());
-             date = date.plusDays(1)) {
-
-            String key = booking.getVehicleId() + ":" + date;
-            String heldBookingId = (String) redisTemplate.opsForValue().get(key);
-
-            if (!bookingId.equals(heldBookingId)) {
-                throw new RuntimeException("Booking not held for " + date);
-            }
+        else {
+            bookingEventPublisher.handleBookingCreated(BookingCreatedEvent.builder()
+                    .bookingId(booking.getBookingId())
+                    .userId(booking.getUserId())
+                    .amount(booking.getCost())
+                    .build());
+            return BookingResponseDto.builder()
+                    .BookingId(bookingId)
+                    .bookingStatus(BookingStatus.PENDING.name())
+                    .totlecost(booking.getCost())
+                    .build();
         }
-
-        booking.setUpdatedAt(LocalDate.now());
-        booking.setStatus(BookingStatus.CONFIRMED);
-        bookingRepository.save(booking);
-
-        for (LocalDate date = booking.getFromDate(); !date.isAfter(booking.getEndDate()); date = date.plusDays(1)) {
-            redisTemplate.delete( booking.getVehicleId() + ":" + date);
-        }
-
-        return BookingResponseDto.builder()
-                .BookingId(bookingId)
-                .bookingStatus(BookingStatus.CONFIRMED.name())
-                .totlecost(booking.getCost())
-                .build();
     }
 
     public Booking cancelBooking(String userId, RequestId boookingId) {
@@ -148,13 +135,8 @@ public class BookingService {
         if(booking.getStatus() == BookingStatus.COMPLETED) {
             throw new RuntimeException("BOOKING ALREADY COMPLETED");
         }
-        booking.setStatus(BookingStatus.CANCELLED);
-        booking.setUpdatedAt(java.time.LocalDate.now());
 
-        removeFromBookedVehicleAndDates(bookingId);
-        for(LocalDate date = booking.getFromDate(); !date.isAfter(booking.getEndDate()); date = date.plusDays(1)) {
-            redisTemplate.delete( booking.getVehicleId() + ":" + date);
-        }
+
         return bookingRepository.save(booking);
     }
     @Scheduled(cron = "0 0 0 * * ?") // Runs daily at midnight

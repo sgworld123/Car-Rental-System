@@ -5,14 +5,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentSuccessEvent {
+public class BookingCreatedEvent {
     private String bookingId;
-    private String transactionId;
+    private String userId;
+    private String vehicleId;
     private double amount;
-    private LocalDateTime paidAt;
+    private LocalDate fromDate;
+    private LocalDate toDate;
+    private LocalDateTime createdAt;
 }
