@@ -1,6 +1,8 @@
 package com.CarRentalSystem.AgencyService.Service;
 
 import com.CarRentalSystem.AgencyService.Dto.*;
+import com.CarRentalSystem.AgencyService.Exceptions.AgencyNotFoundException;
+import com.CarRentalSystem.AgencyService.Exceptions.VehicleNotFoundException;
 import com.CarRentalSystem.AgencyService.Model.Agency;
 import com.CarRentalSystem.AgencyService.Model.Vehicle;
 import com.CarRentalSystem.AgencyService.Repository.AgencyRepository;
@@ -21,7 +23,6 @@ public class AgencyService {
     private final AgencyRepository agencyRepository;
     private final VehicleRepository vehicleRepository;
     private final RedisTemplate<String,Object> redisTemplate;
-    //register agency
     public AgencyResponseDto registerAgency(AgencyRegisterRequestDto agencyRegisterRequestDto)
     {
         Agency agency = Agency.builder()
@@ -77,6 +78,10 @@ public class AgencyService {
         Pageable pageable = PageRequest.of(searchRequestDto.getPageNumber(), searchRequestDto.getPageSize());
         Page<Agency> pageAgency = agencyRepository.findBySourceCity(searchRequestDto.getSourceCity(),pageable);
         List<Agency> agencies = pageAgency.getContent();
+        if(agencies.isEmpty())
+        {
+            throw new AgencyNotFoundException("No agencies found in the specified source city");
+        }
         List<AgencySearchResponse> agencyList = agencies.stream().map(agency -> AgencySearchResponse.builder()
                 .id(agency.getId())
                 .name(agency.getName())
@@ -111,7 +116,7 @@ public class AgencyService {
                         .sourceCity(agency.getSourceCity())
                         .vehicleInfo(agency.getVehicleInfo())
                         .build())
-                .orElseThrow(() -> new RuntimeException("Agency not found with id: " + agencyId));
+                .orElseThrow(() -> new AgencyNotFoundException("Agency not found with id: " + agencyId));
     }
 
     public boolean isAgencyValid(String agencyId) {
@@ -139,6 +144,6 @@ public class AgencyService {
                 }
             }
         }
-        throw new RuntimeException("Vehicle not found with id: " + vehicleId);
+        throw new VehicleNotFoundException("Vehicle not found with id: " + vehicleId);
     }
 }

@@ -97,9 +97,13 @@ public class BookingService {
         return days * bookingRequestDto.getCost();
     }
 
-    public BookingResponseDto confirmBooking(String bookingId) {
+    public BookingResponseDto confirmBooking(String userId,String bookingId) {
         Booking booking = bookingRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
+        if(!Objects.equals(booking.getUserId(), userId))
+        {
+            throw new RuntimeException("Unauthorized confirmation attempt");
+        }
         if(booking.getStatus() == BookingStatus.CONFIRMED) {
             throw new RuntimeException("BOOKING ALREADY CONFIRMED");
         } else if (booking.getStatus() == BookingStatus.CANCELLED) {

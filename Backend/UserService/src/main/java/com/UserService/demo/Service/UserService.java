@@ -21,7 +21,6 @@ public class UserService {
     }
 
     public ProfileDto returnProfile(String userId) {
-        System.out.println(userId);
         User user = (User) userRepository.findByAuthId(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

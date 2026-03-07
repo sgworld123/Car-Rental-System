@@ -1,10 +1,12 @@
 package com.CarRentalSystem.AgencyService.Controller;
 
 import com.CarRentalSystem.AgencyService.Dto.*;
+import com.CarRentalSystem.AgencyService.Exceptions.VehicleNotFoundException;
 import com.CarRentalSystem.AgencyService.Model.Agency;
 import com.CarRentalSystem.AgencyService.Model.Vehicle;
 import com.CarRentalSystem.AgencyService.Service.AgencyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,18 +18,18 @@ public class AgencyController {
     private final AgencyService agencyService;
 
     @PostMapping("/register")
-    public AgencyResponseDto registerAgency(@RequestBody AgencyRegisterRequestDto agencyRegisterRequestDto)
+    public ResponseEntity<AgencyResponseDto> registerAgency(@RequestBody AgencyRegisterRequestDto agencyRegisterRequestDto)
     {
-        return agencyService.registerAgency(agencyRegisterRequestDto);
+        return ResponseEntity.ok(agencyService.registerAgency(agencyRegisterRequestDto));
     }
     @PostMapping("/search")
-    public PagedSearchResponse searchAgenciesBySourceCity(@RequestBody SearchRequestDto searchRequestDto) {
-        return agencyService.getAgenciesBySourceCity(searchRequestDto);
+    public ResponseEntity<PagedSearchResponse> searchAgenciesBySourceCity(@RequestBody SearchRequestDto searchRequestDto) {
+        return ResponseEntity.ok(agencyService.getAgenciesBySourceCity(searchRequestDto));
     }
     @GetMapping("/{agencyId}")
-    public AgencyResponseDto getAgencyById(@PathVariable String agencyId)
+    public ResponseEntity<AgencyResponseDto> getAgencyById(@PathVariable String agencyId)
     {
-        return agencyService.getAgencyById(agencyId);
+        return ResponseEntity.ok(agencyService.getAgencyById(agencyId));
     }
     @GetMapping("/validate/{agencyId}")
     public boolean validateAgency(@PathVariable String agencyId)
@@ -40,8 +42,7 @@ public class AgencyController {
         return agencyService.isVehicleValid(vehicleId);
     }
     @GetMapping("/vehicle/{vehicleId}")
-    public Vehicle getVehicleById(@PathVariable String vehicleId)
-    {
-        return agencyService.getVehicleById(vehicleId);
+    public ResponseEntity<Vehicle> getVehicleById(@PathVariable String vehicleId) throws VehicleNotFoundException {
+        return ResponseEntity.ok(agencyService.getVehicleById(vehicleId));
     }
 }

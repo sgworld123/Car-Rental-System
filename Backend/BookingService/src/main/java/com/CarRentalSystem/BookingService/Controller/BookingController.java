@@ -6,9 +6,7 @@ import com.CarRentalSystem.BookingService.Dto.BookingResponseDto;
 import com.CarRentalSystem.BookingService.Dto.RequestId;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Service.BookingService;
-import com.CarRentalSystem.BookingService.Service.RedisTestService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,9 +24,9 @@ public class BookingController {
         return bookingService.createBooking(userId,bookingRequestDto);
     }
     @PutMapping("/confirm/{bookingId}")
-    public BookingResponseDto confirmBooking(@PathVariable String bookingId)
+    public BookingResponseDto confirmBooking(@RequestHeader("X-User-Id") String userId,@PathVariable String bookingId)
     {
-        return bookingService.confirmBooking(bookingId);
+        return bookingService.confirmBooking(userId,bookingId);
     }
     @PutMapping("/cancel")
     public Booking cancelBooking(@RequestHeader("X-User-Id") String userId,@RequestBody RequestId bookingId)

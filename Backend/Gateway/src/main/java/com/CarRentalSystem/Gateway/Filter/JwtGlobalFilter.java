@@ -11,11 +11,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class JwtGlobalFilter implements GlobalFilter {
     private final JwtUtils jwtUtils;
-
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
@@ -30,6 +31,13 @@ public class JwtGlobalFilter implements GlobalFilter {
             return exchange.getResponse().setComplete();
         }
         String token = authHeader.substring(7);
+
+        Optional<Claims> claimsOpt = jwtUtils.validateAndExtractClaims(token);
+        if(claimsOpt.isEmpty())
+        {
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
 
         Claims claims = jwtUtils.extractClaims(token);
 

@@ -3,6 +3,7 @@ package com.CarRentalSystem.AgencyService.Service;
 import com.CarRentalSystem.AgencyService.Dto.AgencyRegisterRequestDto;
 import com.CarRentalSystem.AgencyService.Dto.AgencyResponseDto;
 import com.CarRentalSystem.AgencyService.Dto.AgencySearchResponse;
+import com.CarRentalSystem.AgencyService.Exceptions.VehicleNotFoundException;
 import com.CarRentalSystem.AgencyService.Model.Agency;
 import com.CarRentalSystem.AgencyService.Model.ModelType;
 import com.CarRentalSystem.AgencyService.Model.Vehicle;
