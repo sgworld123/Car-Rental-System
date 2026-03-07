@@ -1,6 +1,10 @@
 package com.CarRentalSystem.BookingService.Service;
 
 import com.CarRentalSystem.BookingService.Dto.*;
+import com.CarRentalSystem.BookingService.Exceptions.BookingAlreadyCompletedException;
+import com.CarRentalSystem.BookingService.Exceptions.BookingNotFoundException;
+import com.CarRentalSystem.BookingService.Exceptions.UserIsUnauthorizedException;
+import com.CarRentalSystem.BookingService.Exceptions.VehicleUnavailableOnDatesException;
 import com.CarRentalSystem.BookingService.Models.BookedVehicleAndDates;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Models.BookingStatus;
@@ -45,7 +49,7 @@ public class BookingService {
                         Duration.ofMinutes(15)
                 );
                 if (Boolean.FALSE.equals(acquired)) {
-                    throw new RuntimeException("Vehicle unavailable on " + date);
+                    throw new VehicleUnavailableOnDatesException("Vehicle unavailable on " + date);
                 }
                 BookedVehicleAndDates bookedVehicleAndDates = BookedVehicleAndDates.builder()
                         .bookingId(bookingId)
@@ -78,20 +82,11 @@ public class BookingService {
                 .totalCost(booking.getCost())
                 .build();
     }
-
     private void removeFromBookedVehicleAndDates(String bookingId) {
-        try
-        {
-            bookedVehicleAndDatesRepository.deleteByBookingId(bookingId);
-        }
-        catch (Exception e)
-        {
-            log.error("Error while removing booked vehicle and dates for bookingId: " + bookingId, e);
-        }
+        bookedVehicleAndDatesRepository.deleteByBookingId(bookingId);
     }
     public double getCost(BookingRequestDto bookingRequestDto)
     {
-        // Dummy implementation, replace with actual cost calculation logic
         long days = (bookingRequestDto.getToDate())
                 .toEpochDay() - (bookingRequestDto.getFromDate()).toEpochDay() + 1;
         return days * bookingRequestDto.getCost();
@@ -99,17 +94,17 @@ public class BookingService {
 
     public BookingResponseDto confirmBooking(String userId,String bookingId) {
         Booking booking = bookingRepository.findByBookingId(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found with Id : " + bookingId));
         if(!Objects.equals(booking.getUserId(), userId))
         {
-            throw new RuntimeException("Unauthorized confirmation attempt");
+            throw new UserIsUnauthorizedException("Unauthorized confirmation attempt");
         }
         if(booking.getStatus() == BookingStatus.CONFIRMED) {
             throw new RuntimeException("BOOKING ALREADY CONFIRMED");
         } else if (booking.getStatus() == BookingStatus.CANCELLED) {
             throw new RuntimeException("CANCELLED BOOKING CANNOT BE CONFIRMED");
         } else if (booking.getStatus() == BookingStatus.COMPLETED) {
-            throw new RuntimeException("COMPLETED BOOKING CANNOT BE CONFIRMED");
+            throw new BookingAlreadyCompletedException("COMPLETED BOOKING CANNOT BE CONFIRMED");
         }
         else {
             bookingEventPublisher.handleBookingCreated(BookingCreatedEvent.builder()
@@ -127,13 +122,13 @@ public class BookingService {
     public Booking cancelBooking(String userId, RequestId boookingId) {
         String bookingId = boookingId.getBookingId();
         Booking booking = bookingRepository.findByBookingId(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
         if(!Objects.equals(booking.getUserId(), userId))
         {
-            throw new RuntimeException("Unauthorized cancellation attempt");
+            throw new UserIsUnauthorizedException("Unauthorized cancellation attempt");
         }
         if(booking.getStatus() == BookingStatus.COMPLETED) {
-            throw new RuntimeException("BOOKING ALREADY COMPLETED");
+            throw new BookingAlreadyCompletedException("BOOKING ALREADY COMPLETED");
         }
         bookedVehicleAndDatesRepository.deleteByBookingId(bookingId);
         bookingEventPublisher.handleBookingCancelled(BookingCancelledEvent.builder()
@@ -158,7 +153,6 @@ public class BookingService {
             bookedVehicleAndDatesRepository.deleteByBookingId(booking.getBookingId());
 
         });
-
         bookingRepository.saveAll(bookings);
     }
 

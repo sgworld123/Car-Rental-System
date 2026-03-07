@@ -1,4 +1,4 @@
-package com.CarRentalSystem.BookingService.Exceptions;
+package com.CarRentalSystem.BookingService.Errors;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

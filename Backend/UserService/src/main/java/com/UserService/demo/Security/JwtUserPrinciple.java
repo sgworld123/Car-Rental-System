@@ -1,19 +1,16 @@
 package com.UserService.demo.Security;
 
+import lombok.Data;
+import lombok.Getter;
+
+@Getter
 public class JwtUserPrinciple{
-    private String userId;
-    private String username;
+    private final String userId;
+    private final String username;
 
     public JwtUserPrinciple(String userId, String username) {
         this.userId = userId;
         this.username = username;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
 }

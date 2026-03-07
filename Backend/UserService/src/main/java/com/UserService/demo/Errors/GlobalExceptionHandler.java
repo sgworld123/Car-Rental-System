@@ -1,6 +1,7 @@
 package com.UserService.demo.Errors;
 
 import com.UserService.demo.Dto.SignupResponseDto;
+import com.UserService.demo.Exceptions.UserNameAlreadyTakenException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,31 +15,19 @@ import java.nio.file.AccessDeniedException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<SignupResponseDto.ApiErrorDto> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-        SignupResponseDto.ApiErrorDto errorDto = new SignupResponseDto.ApiErrorDto("User not found" + ex.getMessage() , HttpStatus.NOT_FOUND);
-        return ResponseEntity.status(404).body(errorDto);
+    public ResponseEntity<ApiErrorDto> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiErrorDto.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.NOT_FOUND)
+                .timestamp(java.time.LocalDateTime.now())
+                .build());
     }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<SignupResponseDto.ApiErrorDto> handleAuthenticationException(AuthenticationException ex) {
-        SignupResponseDto.ApiErrorDto apiError = new SignupResponseDto.ApiErrorDto("Authentication failed: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(JwtException.class)
-    public ResponseEntity<SignupResponseDto.ApiErrorDto> handleJwtException(JwtException ex) {
-        SignupResponseDto.ApiErrorDto apiError = new SignupResponseDto.ApiErrorDto("Invalid JWT token: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<SignupResponseDto.ApiErrorDto> handleAccessDeniedException(AccessDeniedException ex) {
-        SignupResponseDto.ApiErrorDto apiError = new SignupResponseDto.ApiErrorDto("Access denied: Insufficient permissions", HttpStatus.FORBIDDEN);
-        return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
-    }
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<SignupResponseDto.ApiErrorDto> handleGenericException(Exception ex) {
-        SignupResponseDto.ApiErrorDto errorDto = new SignupResponseDto.ApiErrorDto("An error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        return ResponseEntity.status(500).body(errorDto);
+    @ExceptionHandler(UserNameAlreadyTakenException.class)
+    public ResponseEntity<ApiErrorDto> handleUserNameAlreadyTakenException(UserNameAlreadyTakenException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorDto.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.BAD_REQUEST)
+                .timestamp(java.time.LocalDateTime.now())
+                .build());
     }
 }

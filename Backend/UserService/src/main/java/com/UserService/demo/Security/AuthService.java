@@ -4,12 +4,14 @@ import com.UserService.demo.Dto.LoginRequestDto;
 import com.UserService.demo.Dto.LoginResponseDto;
 import com.UserService.demo.Dto.SignupRequestDto;
 import com.UserService.demo.Dto.SignupResponseDto;
+import com.UserService.demo.Exceptions.UserNameAlreadyTakenException;
 import com.UserService.demo.Model.AuthUser;
 import com.UserService.demo.Model.User;
 import com.UserService.demo.Repository.AuthUserRepository;
 import com.UserService.demo.Repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final AuthUtils authUtils;
@@ -45,7 +48,7 @@ public class AuthService {
 
         authUserRepository.findByUsername(signupRequestDto.getUsername())
                 .ifPresent(user -> {
-                    throw new RuntimeException("Username already taken");
+                    throw new UserNameAlreadyTakenException("Username already taken");
                 });
 
         AuthUser authUser = AuthUser.builder()
@@ -55,7 +58,7 @@ public class AuthService {
                 .build();
         authUser = authUserRepository.save(authUser);
 
-        System.out.println(authUser.getId());
+        log.info("Created AuthUser with ID: {}", authUser.getId());
 
         User user = User.builder()
                 .authId(authUser.getId())

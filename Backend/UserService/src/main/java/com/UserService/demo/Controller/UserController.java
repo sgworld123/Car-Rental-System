@@ -6,6 +6,7 @@ import com.UserService.demo.Dto.ResponseDto;
 import com.UserService.demo.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,8 +20,8 @@ public class UserController {
         return userService.validateUser(userId);
     }
     @GetMapping("/profile")
-    public ProfileDto returnProfile(@RequestHeader("X-User-Id") String userId)
+    public ResponseEntity<ProfileDto> returnProfile(@RequestHeader("X-User-Id") String userId)
     {
-        return userService.returnProfile(userId);
+        return ResponseEntity.ok(userService.returnProfile(userId));
     }
 }

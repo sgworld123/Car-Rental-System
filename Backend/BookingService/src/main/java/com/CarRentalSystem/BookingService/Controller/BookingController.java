@@ -7,6 +7,7 @@ import com.CarRentalSystem.BookingService.Dto.RequestId;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Service.BookingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,16 +18,15 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
-    private final RedisTestService redisTestService;
     @PostMapping
-    public BookingResponseDto createBooking(@RequestHeader("X-User-Id") String userId
+    public ResponseEntity<BookingResponseDto> createBooking(@RequestHeader("X-User-Id") String userId
             ,@RequestBody BookingRequestDto bookingRequestDto) {
-        return bookingService.createBooking(userId,bookingRequestDto);
+        return ResponseEntity.ok(bookingService.createBooking(userId,bookingRequestDto));
     }
     @PutMapping("/confirm/{bookingId}")
-    public BookingResponseDto confirmBooking(@RequestHeader("X-User-Id") String userId,@PathVariable String bookingId)
+    public ResponseEntity<BookingResponseDto> confirmBooking(@RequestHeader("X-User-Id") String userId, @PathVariable String bookingId)
     {
-        return bookingService.confirmBooking(userId,bookingId);
+        return ResponseEntity.ok(bookingService.confirmBooking(userId,bookingId));
     }
     @PutMapping("/cancel")
     public Booking cancelBooking(@RequestHeader("X-User-Id") String userId,@RequestBody RequestId bookingId)
@@ -37,10 +37,5 @@ public class BookingController {
     public List<BookingByIdResponse> getBooking(@RequestHeader("X-User-Id") String userId)
     {
         return bookingService.getBooking(userId);
-    }
-    @GetMapping("/test")
-    public String getConnection()
-    {
-        return redisTestService.test();
     }
 }

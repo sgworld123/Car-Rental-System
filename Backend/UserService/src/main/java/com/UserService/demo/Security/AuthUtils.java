@@ -31,7 +31,6 @@ public class AuthUtils {
                 .stream()
                 .map(a-> a.getAuthority())
                 .toList());
-
         return Jwts.builder()
                 .setSubject(authUser.getUsername())
                 .setClaims(claims)
@@ -40,7 +39,6 @@ public class AuthUtils {
                 .signWith(getSecretKey())
                 .compact();
     }
-
     public Claims extractClaims(String jwtToken) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSecretKey())
