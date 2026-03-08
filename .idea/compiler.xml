@@ -10,7 +10,7 @@
         <module name="eureka" />
         <module name="Gateway" />
       </profile>
-      <profile name="Annotation profile for UserService" enabled="true">
+      <profile name="Annotation profile for PaymentService" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -18,16 +18,8 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
         <module name="AgencyService" />
-        <module name="demo" />
         <module name="BookingService" />
-      </profile>
-      <profile name="Annotation profile for PaymentService" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-        </processorPath>
+        <module name="UserService" />
         <module name="PaymentService" />
       </profile>
     </annotationProcessing>
@@ -38,7 +30,7 @@
       <module name="BookingService" options="-parameters" />
       <module name="Gateway" options="-parameters" />
       <module name="PaymentService" options="-parameters" />
-      <module name="demo" options="-parameters" />
+      <module name="UserService" options="-parameters" />
       <module name="eureka" options="-parameters" />
     </option>
   </component>

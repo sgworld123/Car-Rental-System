@@ -39,7 +39,7 @@ public class JwtGlobalFilter implements GlobalFilter {
             return exchange.getResponse().setComplete();
         }
 
-        Claims claims = jwtUtils.extractClaims(token);
+        Claims claims = claimsOpt.get();
 
         String username = claims.getSubject();
         String userId = claims.get("userId").toString();

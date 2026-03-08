@@ -1,10 +1,7 @@
 package com.CarRentalSystem.BookingService.Service;
 
 import com.CarRentalSystem.BookingService.Dto.*;
-import com.CarRentalSystem.BookingService.Exceptions.BookingAlreadyCompletedException;
-import com.CarRentalSystem.BookingService.Exceptions.BookingNotFoundException;
-import com.CarRentalSystem.BookingService.Exceptions.UserIsUnauthorizedException;
-import com.CarRentalSystem.BookingService.Exceptions.VehicleUnavailableOnDatesException;
+import com.CarRentalSystem.BookingService.Exceptions.*;
 import com.CarRentalSystem.BookingService.Models.BookedVehicleAndDates;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Models.BookingStatus;
@@ -19,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -72,7 +70,7 @@ public class BookingService {
                 .cost(getCost(bookingRequestDto))
                 .fromDate(bookingRequestDto.getFromDate())
                 .endDate(bookingRequestDto.getToDate())
-                .createdAt(LocalDate.now())
+                .createdAt(LocalDateTime.now())
                 .status(BookingStatus.PENDING)
                 .build();
         bookingRepository.save(booking);
@@ -113,19 +111,25 @@ public class BookingService {
                     .amount(booking.getCost())
                     .build());
             return BookingResponseDto.builder()
-                    .bookingId(bookingId)
-                    .bookingStatus(BookingStatus.CONFIRMED.name())
+                    .bookingId(booking.getBookingId())
+                    .bookingStatus(BookingStatus.PENDING.name())
                     .totalCost(booking.getCost())
                     .build();
         }
     }
-    public Booking cancelBooking(String userId, RequestId boookingId) {
+    public BookingResponseDto cancelBooking(String userId, RequestId boookingId) {
         String bookingId = boookingId.getBookingId();
         Booking booking = bookingRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
         if(!Objects.equals(booking.getUserId(), userId))
         {
             throw new UserIsUnauthorizedException("Unauthorized cancellation attempt");
+        }
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new BookingIsAlreadyCancelledException("BOOKING ALREADY CANCELLED");
+        }
+        if(booking.getStatus() == BookingStatus.PENDING) {
+            throw new RuntimeException("PENDING BOOKING CANNOT BE CANCELLED");
         }
         if(booking.getStatus() == BookingStatus.COMPLETED) {
             throw new BookingAlreadyCompletedException("BOOKING ALREADY COMPLETED");
@@ -136,9 +140,11 @@ public class BookingService {
                 .userId(booking.getUserId())
                 .amount(booking.getCost())
                 .build());
-        booking.setStatus(BookingStatus.CANCELLED);
-        booking.setUpdatedAt(LocalDate.now());
-        return bookingRepository.save(booking);
+        return BookingResponseDto.builder()
+                .bookingId(booking.getBookingId())
+                .bookingStatus(BookingStatus.PENDING.name())
+                .totalCost(booking.getCost())
+                .build();
     }
     @Scheduled(cron = "0 0 0 * * ?") // Runs daily at midnight
     public void completeExpiredBookings()
@@ -149,7 +155,7 @@ public class BookingService {
         );
         bookings.forEach(booking -> {
             booking.setStatus(BookingStatus.COMPLETED);
-            booking.setUpdatedAt(java.time.LocalDate.now());
+            booking.setUpdatedAt(LocalDateTime.now());
             bookedVehicleAndDatesRepository.deleteByBookingId(booking.getBookingId());
 
         });

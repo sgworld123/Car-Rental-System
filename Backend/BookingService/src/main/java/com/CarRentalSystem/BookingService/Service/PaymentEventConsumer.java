@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -30,7 +31,7 @@ public class PaymentEventConsumer {
         {
             Booking booking = optionalBooking.get();
             booking.setStatus(BookingStatus.CONFIRMED);
-            booking.setUpdatedAt(LocalDate.now());
+            booking.setUpdatedAt(LocalDateTime.now());
             bookingRepository.save(booking);
         }
         else
@@ -47,7 +48,7 @@ public class PaymentEventConsumer {
         {
             Booking booking = optionalBooking.get();
             booking.setStatus(BookingStatus.CANCELLED);
-            booking.setUpdatedAt(LocalDate.now());
+            booking.setUpdatedAt(LocalDateTime.now());
             bookingRepository.save(booking);
             for (LocalDate date = booking.getFromDate(); !date.isAfter(booking.getEndDate()); date = date.plusDays(1)) {
                 redisTemplate.delete( booking.getVehicleId() + ":" + date);

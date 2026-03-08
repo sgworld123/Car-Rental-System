@@ -1,9 +1,6 @@
 package com.CarRentalSystem.BookingService.Errors;
 
-import com.CarRentalSystem.BookingService.Exceptions.BookingAlreadyCompletedException;
-import com.CarRentalSystem.BookingService.Exceptions.BookingNotFoundException;
-import com.CarRentalSystem.BookingService.Exceptions.UserIsUnauthorizedException;
-import com.CarRentalSystem.BookingService.Exceptions.VehicleUnavailableOnDatesException;
+import com.CarRentalSystem.BookingService.Exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -88,5 +85,15 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build());
     }
+    @ExceptionHandler(BookingIsAlreadyCancelledException.class)
+    public ResponseEntity<ApiError> handleBookingAlreadyCancelled(BookingIsAlreadyCancelledException e)
+    {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiError.builder()
+                        .timestamp(LocalDateTime.now())
+                        .message(e.getMessage())
+                        .build());
+    }
+
 
 }
