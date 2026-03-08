@@ -56,6 +56,7 @@ public class AgencyService {
         Agency savedAgency = agencyRepository.save(agency);
 
         return AgencyResponseDto.builder()
+                .id(savedAgency.getId())
                 .email(savedAgency.getEmail())
                 .name(savedAgency.getName())
                 .phone((savedAgency.getPhone()))
@@ -124,26 +125,11 @@ public class AgencyService {
     }
 
     public boolean isVehicleValid(String vehicleId) {
-        List<Agency> agencies = agencyRepository.findAll();
-        for (Agency agency : agencies) {
-            for (Vehicle vehicle : agency.getVehicleInfo()) {
-                if (vehicle.getVehicleId().equals(vehicleId)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return vehicleRepository.existsById(vehicleId);
     }
 
     public Vehicle getVehicleById(String vehicleId) {
-        List<Agency> agencies = agencyRepository.findAll();
-        for (Agency agency : agencies) {
-            for (Vehicle vehicle : agency.getVehicleInfo()) {
-                if (vehicle.getVehicleId().equals(vehicleId)) {
-                    return vehicle;
-                }
-            }
-        }
-        throw new VehicleNotFoundException("Vehicle not found with id: " + vehicleId);
+        return vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with id: " + vehicleId));
     }
 }
