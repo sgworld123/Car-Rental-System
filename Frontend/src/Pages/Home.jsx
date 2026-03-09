@@ -10,7 +10,8 @@ const Home = () => {
     sourceCity: '',
     destinationCity: '',
     fromDate: '',
-    toDate: ''
+    toDate: '',
+    pageNumber: '1'
   });
 
   const handleChange = (e) => {
@@ -166,7 +167,6 @@ const Home = () => {
               required
             />
           </div>
-
           <button
             type="submit"
             style={styles.searchButton}

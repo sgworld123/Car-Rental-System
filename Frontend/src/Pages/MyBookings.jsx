@@ -6,43 +6,85 @@ const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cancellingIds, setCancellingIds] = useState(new Set());
+  const pollRefs = useRef({});
 
-  const { cancel, cancelLoading, cancelError } = useCancelBooking();
+  const { cancel, cancelError } = useCancelBooking();
+
+  const fetchBookings = async () => {
+    try {
+      const response = await getUserBookings();
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data
+        ? [response.data]
+        : [];
+      setBookings(data);
+      return data;
+    } catch (err) {
+      console.error("Error fetching bookings:", err);
+      setError("Failed to load bookings.");
+      return [];
+    }
+  };
 
   useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const response = await getUserBookings();
+    fetchBookings().finally(() => setLoading(false));
 
-        const data = Array.isArray(response.data)
-          ? response.data
-          : response.data
-          ? [response.data]
-          : [];
-
-        setBookings(data);
-      } catch (err) {
-        console.error("Error fetching bookings:", err);
-        setError("Failed to load bookings.");
-      } finally {
-        setLoading(false);
-      }
+    // Cleanup all polls on unmount
+    return () => {
+      Object.values(pollRefs.current).forEach(({ interval, timeout }) => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      });
     };
-
-    fetchBookings();
   }, []);
 
   const handleCancel = async (id) => {
     try {
-      console.log("Sending bookingId:", id);
       await cancel(id);
+
+      // Mark as cancelling (intermediate state)
+      setCancellingIds((prev) => new Set(prev).add(id));
       setBookings((prev) =>
-        prev.map((b) =>
-          b.bookingId === id ? { ...b, status: "CANCELLED" } : b
-        )
+        prev.map((b) => (b.bookingId === id ? { ...b, status: "CANCELLING" } : b))
       );
+
+      // Poll every 2s for up to 30s
+      const interval = setInterval(async () => {
+        const data = await fetchBookings();
+        const updated = data.find((b) => b.bookingId === id);
+        if (updated?.status === "CANCELLED") {
+          clearInterval(interval);
+          clearTimeout(pollRefs.current[id]?.timeout);
+          delete pollRefs.current[id];
+          setCancellingIds((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+        }
+      }, 2000);
+
+      // Stop polling after 30s
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+        delete pollRefs.current[id];
+        setCancellingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }, 30000);
+
+      pollRefs.current[id] = { interval, timeout };
     } catch (e) {
       console.error("Cancel failed", e);
+      setCancellingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
@@ -59,52 +101,56 @@ const MyBookings = () => {
       )}
 
       <div style={list}>
-        {bookings.map((b) => (
-          <div key={b.bookingId} style={card}>
-            <div style={row}>
-              <h3 style={vehicle}>Vehicle ID: {b.vehicleId}</h3>
+        {bookings.map((b) => {
+          const isCancelling = cancellingIds.has(b.bookingId);
 
-              <span
-                style={{
-                  ...statusBadge,
-                  background:
-                    b.status === "CONFIRMED"
-                      ? "#14532d"
-                      : b.status === "CANCELLED"
-                      ? "#7f1d1d"
-                      : "#3f3f46",
-                }}
-              >
-                {b.status}
-              </span>
+          return (
+            <div key={b.bookingId} style={card}>
+              <div style={row}>
+                <h3 style={vehicle}>Vehicle ID: {b.vehicleId}</h3>
+                <span
+                  style={{
+                    ...statusBadge,
+                    background:
+                      b.status === "CONFIRMED"
+                        ? "#14532d"
+                        : b.status === "CANCELLED"
+                        ? "#7f1d1d"
+                        : b.status === "CANCELLING"
+                        ? "#92400e"
+                        : "#3f3f46",
+                  }}
+                >
+                  {b.status}
+                </span>
+              </div>
+
+              <div style={divider} />
+
+              <p style={text}>From: {b.fromDate}</p>
+              <p style={text}>To: {b.endDate}</p>
+              <h3 style={price}>₹{b.cost}</h3>
+
+              {(b.status === "PENDING" || isCancelling) && (
+                <button
+                  onClick={() => handleCancel(b.bookingId)}
+                  disabled={isCancelling}
+                  style={{
+                    marginTop: 12,
+                    padding: "8px 16px",
+                    background: isCancelling ? "#444" : "#b91c1c",
+                    border: "none",
+                    borderRadius: 6,
+                    color: "#fff",
+                    cursor: isCancelling ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {isCancelling ? "Cancelling..." : "Cancel Booking"}
+                </button>
+              )}
             </div>
-
-            <div style={divider} />
-
-            <p style={text}>From: {b.fromDate}</p>
-            <p style={text}>To: {b.endDate}</p>
-
-            <h3 style={price}>₹{b.cost}</h3>
-
-            {b.status === "PENDING" && (
-              <button
-                onClick={() => handleCancel(b.bookingId)}
-                disabled={cancelLoading}
-                style={{
-                  marginTop: 12,
-                  padding: "8px 16px",
-                  background: cancelLoading ? "#444" : "#b91c1c",
-                  border: "none",
-                  borderRadius: 6,
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
-              >
-                {cancelLoading ? "Cancelling..." : "Cancel Booking"}
-              </button>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
