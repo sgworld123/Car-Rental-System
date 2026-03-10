@@ -1,6 +1,7 @@
 package com.CarRentalSystem.BookingService.Errors;
 
 import com.CarRentalSystem.BookingService.Exceptions.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiError> handleRuntime(RuntimeException ex) {
@@ -25,29 +28,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidation(
-            MethodArgumentNotValidException ex) {
-
-        Map<String, String> errors = new HashMap<>();
-
-        ex.getBindingResult().getFieldErrors()
-                .forEach(e -> errors.put(e.getField(), e.getDefaultMessage()));
-
-        return ResponseEntity.badRequest().body(errors);
+    public ResponseEntity<ApiError> handleValidationErrors(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        return ResponseEntity.badRequest().body(ApiError.builder()
+                .message(message)
+                .status(HttpStatus.BAD_REQUEST.value())
+                .timestamp(LocalDateTime.now())
+                .build());
     }
 
     // Catch everything else
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGlobal(Exception ex) {
-
         ApiError error = ApiError.builder()
                 .message("Internal server error")
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .timestamp(LocalDateTime.now())
                 .build();
-
-        ex.printStackTrace();
-
+        log.error("Unhandled exception: ", ex);
         return ResponseEntity.status(500).body(error);
     }
     @ExceptionHandler(VehicleUnavailableOnDatesException.class)

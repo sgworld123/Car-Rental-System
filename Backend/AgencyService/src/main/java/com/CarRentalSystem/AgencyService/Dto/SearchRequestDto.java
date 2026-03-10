@@ -12,14 +12,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SearchRequestDto {
-    @NotBlank
+    @NotBlank(message = "Source city is required")
     private String sourceCity;
-    @NotBlank
+
+    @NotBlank(message = "Destination city is required")
     private String destinationCity;
-    @NotNull
+
+    @NotNull(message = "From date is required")
     private String fromDate;
-    @NotNull
+
+    @NotNull(message = "To date is required")
     private String toDate;
+
     private int pageNumber = 0;
     private int pageSize = 10;
 }

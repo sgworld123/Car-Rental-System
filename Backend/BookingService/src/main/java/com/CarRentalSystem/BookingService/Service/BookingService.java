@@ -67,7 +67,7 @@ public class BookingService {
                 .bookingId(bookingId)
                 .userId(userId)
                 .vehicleId(bookingRequestDto.getVehicleId())
-                .cost(getCost(bookingRequestDto))
+                .cost(bookingRequestDto.getCost())
                 .fromDate(bookingRequestDto.getFromDate())
                 .endDate(bookingRequestDto.getToDate())
                 .createdAt(LocalDateTime.now())
@@ -142,7 +142,7 @@ public class BookingService {
                 .build());
         return BookingResponseDto.builder()
                 .bookingId(booking.getBookingId())
-                .bookingStatus(BookingStatus.PENDING.name())
+                .bookingStatus(BookingStatus.CANCELLED.name())
                 .totalCost(booking.getCost())
                 .build();
     }
