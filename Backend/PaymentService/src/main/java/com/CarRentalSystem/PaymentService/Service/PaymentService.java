@@ -1,9 +1,6 @@
 package com.CarRentalSystem.PaymentService.Service;
 
-import com.CarRentalSystem.PaymentService.Dto.PaymentMessageDto;
-import com.CarRentalSystem.PaymentService.Dto.PaymentResult;
-import com.CarRentalSystem.PaymentService.Dto.PaymentSuccessEvent;
-import com.CarRentalSystem.PaymentService.Dto.RefundResult;
+import com.CarRentalSystem.PaymentService.Dto.*;
 import com.CarRentalSystem.PaymentService.Errors.Exceptions;
 import com.CarRentalSystem.PaymentService.Models.Payment;
 import com.CarRentalSystem.PaymentService.Models.PaymentStatus;
@@ -21,6 +18,7 @@ import java.util.UUID;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentEventPublisher paymentEventPublisher;
+    private final RefundEventPublisher refundEventPublisher;
     public void processPayment(PaymentMessageDto paymentMessageDto) {
         Payment payment = Payment.builder()
                 .paymentId(UUID.randomUUID().toString())
@@ -69,13 +67,31 @@ public class PaymentService {
             RefundResult result = MockRefundProvider.processRefund(paymentMessageDto.getAmount(), paymentMessageDto.getBookingId());
             if(result.getStatus() == PaymentStatus.SUCCESS) {
                 refundPayment.setStatus(PaymentStatus.REFUND_SUCCESS);
+                refundEventPublisher.publishRefundResult(RefundStatus.builder()
+                        .bookingId(paymentMessageDto.getBookingId())
+                        .status(PaymentStatus.REFUND_SUCCESS)
+                        .amount(paymentMessageDto.getAmount())
+                        .refundedAt(LocalDateTime.now())
+                        .build());
                 log.info("Refund successful for bookingId: {}", paymentMessageDto.getBookingId());
             } else if(result.getStatus() == PaymentStatus.FAILURE) {
                 refundPayment.setStatus(PaymentStatus.REFUND_FAILURE);
+                refundEventPublisher.publishRefundResult(RefundStatus.builder()
+                        .bookingId(paymentMessageDto.getBookingId())
+                        .status(PaymentStatus.REFUND_FAILURE)
+                        .amount(paymentMessageDto.getAmount())
+                        .refundedAt(LocalDateTime.now())
+                        .build());
                 log.warn("Refund failed for bookingId: {}", paymentMessageDto.getBookingId());
             }
             else {
                 refundPayment.setStatus(PaymentStatus.UNKNOWN_ERROR);
+                refundEventPublisher.publishRefundResult(RefundStatus.builder()
+                        .bookingId(paymentMessageDto.getBookingId())
+                        .status(PaymentStatus.UNKNOWN_ERROR)
+                        .amount(paymentMessageDto.getAmount())
+                        .refundedAt(LocalDateTime.now())
+                        .build());
                 log.error("Unknown error during refund for bookingId: {}", paymentMessageDto.getBookingId());
             }
             refundPayment.setUpdatedAt(LocalDateTime.now());

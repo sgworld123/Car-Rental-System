@@ -9,7 +9,7 @@ export const cancelBooking = (bookingId) => {
 };
 
 export const confirmBooking = (bookingId) => {
-  return api.post("/api/booking/confirm", { bookingId });
+    return api.put(`/api/booking/confirm/${bookingId}`);
 };
 
 export const getUserBookings = () => {

@@ -29,7 +29,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.confirmBooking(userId,bookingId));
     }
     @PutMapping("/cancel")
-    public Booking cancelBooking(@RequestHeader("X-User-Id") String userId,@RequestBody RequestId bookingId)
+    public BookingResponseDto cancelBooking(@RequestHeader("X-User-Id") String userId,@RequestBody RequestId bookingId)
     {
         return bookingService.cancelBooking(userId,bookingId);
     }

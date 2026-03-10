@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import { getUserBookings } from "../Services/bookingService";
 import { useCancelBooking } from "../Hooks/useCancelBooking";
 
@@ -131,7 +131,7 @@ const MyBookings = () => {
               <p style={text}>To: {b.endDate}</p>
               <h3 style={price}>₹{b.cost}</h3>
 
-              {(b.status === "PENDING" || isCancelling) && (
+              {(b.status === "CONFIRMED" || isCancelling) && (
                 <button
                   onClick={() => handleCancel(b.bookingId)}
                   disabled={isCancelling}

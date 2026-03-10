@@ -2,12 +2,9 @@ spring:
   application:
     name: AGENCYSERVICE
 
-
   data:
     mongodb:
       uri: ${MONGODB_URI}
-
-
 server:
   port: 8082
 

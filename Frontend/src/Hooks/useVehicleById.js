@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { getVehicleById } from "../Services/agencyService";
 
 export function useVehicleById(vehicleId) {
@@ -6,7 +6,7 @@ export function useVehicleById(vehicleId) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     
-    const fetchVehicle = async () => {
+    const fetchVehicle = useCallback(async () => {
         try {
             const response = await getVehicleById(vehicleId);
             setVehicle(response.data);
@@ -17,6 +17,7 @@ export function useVehicleById(vehicleId) {
         finally {
             setLoading(false);
         }
-    };
+    }, [vehicleId]); 
+
     return { vehicle, loading, error, fetchVehicle };
 }

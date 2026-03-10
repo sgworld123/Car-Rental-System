@@ -7,7 +7,7 @@ export function useSearchAgencies() {
     const searchAgency = async (searchData) => {
         try {
             const response = await searchAgencies(searchData)
-            setSearchResults(response.data);
+            setSearchResults(response.data.agencies);
         } catch (error) {
             console.error("Error searching agencies:", error);
         }

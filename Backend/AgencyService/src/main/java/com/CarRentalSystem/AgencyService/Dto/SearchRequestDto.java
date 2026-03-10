@@ -20,8 +20,6 @@ public class SearchRequestDto {
     private String fromDate;
     @NotNull
     private String toDate;
-    @Builder.Default
     private int pageNumber = 0;
-    @Builder.Default
     private int pageSize = 10;
 }

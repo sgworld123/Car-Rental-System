@@ -3,8 +3,7 @@ package com.CarRentalSystem.BookingService.Config;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.amqp.support.converter.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,10 +16,12 @@ public class PaymentRabbitMQConfig {
     // Queues — BookingService listens to these
     public static final String PAYMENT_SUCCESS_QUEUE = "payment.success.queue";
     public static final String PAYMENT_FAILED_QUEUE  = "payment.failed.queue";
+    public static final String PAYMENT_REFUND_QUEUE  = "payment.refund.queue";
 
     // Routing keys — how exchange knows which queue to route to
     public static final String PAYMENT_SUCCESS_KEY = "payment.success";
     public static final String PAYMENT_FAILED_KEY  = "payment.failed";
+    public static final String PAYMENT_REFUND_KEY  = "payment.refund";
 
     // Dead Letter setup — for failed message handling
     public static final String PAYMENT_DLQ = "payment.dead.letter.queue";
@@ -38,6 +39,21 @@ public class PaymentRabbitMQConfig {
                 .withArgument("x-dead-letter-routing-key", "payment.dead")
                 .build();
     }
+    @Bean
+    public Queue paymentRefundQueue() {
+        return QueueBuilder.durable(PAYMENT_REFUND_QUEUE)
+                .withArgument("x-dead-letter-exchange", PAYMENT_DLX)
+                .withArgument("x-dead-letter-routing-key", "payment.dead")
+                .build();
+    }
+
+    @Bean
+    public Binding refundBinding() {
+        return BindingBuilder
+                .bind(paymentRefundQueue())
+                .to(paymentExchange())
+                .with(PAYMENT_REFUND_KEY);
+    }
 
     @Bean
     public Queue paymentFailedQueue() {
@@ -46,7 +62,6 @@ public class PaymentRabbitMQConfig {
                 .withArgument("x-dead-letter-routing-key", "payment.dead")
                 .build();
     }
-
     @Bean
     public Queue deadLetterQueue() {
         return QueueBuilder.durable(PAYMENT_DLQ).build();
@@ -82,9 +97,14 @@ public class PaymentRabbitMQConfig {
                 .with("payment.dead");
     }
 
+    // BookingService PaymentRabbitMQConfig.java
     @Bean
     public MessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+        DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
+        typeMapper.setTypePrecedence(Jackson2JavaTypeMapper.TypePrecedence.INFERRED);
+        converter.setJavaTypeMapper(typeMapper);
+        return converter;
     }
 
     @Bean

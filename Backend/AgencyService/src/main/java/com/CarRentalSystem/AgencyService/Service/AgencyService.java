@@ -129,7 +129,10 @@ public class AgencyService {
     }
 
     public Vehicle getVehicleById(String vehicleId) {
-        return vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with id: " + vehicleId));
+        Vehicle vehicle = vehicleRepository.findByVehicleId(vehicleId);
+        if (vehicle == null) {
+            throw new VehicleNotFoundException("Vehicle not found with id: " + vehicleId);
+        }
+        return vehicle;
     }
 }

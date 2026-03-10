@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useVehicleById } from '../Hooks/useVehicleById';
 import { useCreateBooking } from '../Hooks/useCreateBooking';
+import { useConfirmBooking } from '../Hooks/useConfirmBooking';
 
 const VehicleDetails = () => {
     const location = useLocation();
@@ -11,48 +12,58 @@ const VehicleDetails = () => {
     const [showModal, setShowModal] = useState(false);
     const [currentImage, setCurrentImage] = useState(0);
 
-    const [bookingLoading, setBookingLoading] = useState(false);
 
     const { vehicle, loading, error, fetchVehicle } = useVehicleById(vehicleId);
+
+    const { handleCreateBooking } = useCreateBooking();
+    const { handleConfirmBooking } = useConfirmBooking();
+
+    // store bookingId returned from createBooking
+    const [pendingBookingId, setPendingBookingId] = useState(null);
+    const [bookingLoading, setBookingLoading] = useState(false);
 
     const params = new URLSearchParams(location.search);
     const fromDate = params.get("from");
     const toDate = params.get("to");
 
-    const { handleCreateBooking } = useCreateBooking();
 
     useEffect(() => {
         fetchVehicle();
-    }, [vehicleId, fetchVehicle]);
+    }, [vehicleId]);
 
-    const handleBook = () => {
+    const handleBook = async () => {
         if (!fromDate || !toDate) {
             alert("Search dates missing");
             return;
         }
-        setShowModal(true);
+        try {
+            setBookingLoading(true);
+            const payload = { vehicleId, cost, fromDate, toDate };
+            const result = await handleCreateBooking(payload);
+            setPendingBookingId(result.bookingId); // ✅ save bookingId from response
+            setShowModal(true);
+        } catch (error) {
+            console.error("Booking creation failed:", error);
+            alert("Failed to initiate booking. Please try again.");
+        } finally {
+            setBookingLoading(false);
+        }
     };
 
+    // Confirm → calls confirmBooking with saved bookingId
     const confirmBooking = async () => {
-        const payload = {
-            vehicleId,
-            cost,
-            fromDate,
-            toDate
-        };
         try {
-            console.log(payload)
             setBookingLoading(true);
-            await handleCreateBooking(payload);
-            setBookingLoading(false);
+            await handleConfirmBooking(pendingBookingId); // ✅ uses bookingId from createBooking
             setShowModal(false);
             navigate("/dashboard/bookings");
+        } catch (error) {
+            console.error("Confirm failed:", error);
+            alert("Failed to confirm booking. Please try again.");
+        } finally {
+            setBookingLoading(false);
         }
-        catch (error) {
-            console.error("Booking failed:", error);
-            alert("Failed to create booking. Please try again.");
-        }
-    }
+    };
 
     const days =
         fromDate && toDate
@@ -76,46 +87,28 @@ const VehicleDetails = () => {
                     <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
 
                         {/* Slider */}
-                        <div style={{
-                            position: "relative",
-                            width: "100%",
-                            height: "380px",
-                            marginBottom: "24px"
-                        }}>
-
+                        <div style={{ position: "relative", width: "100%", height: "380px", marginBottom: "24px" }}>
                             <img
                                 src={images[currentImage]}
                                 alt="car"
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                    borderRadius: "20px"
-                                }}
+                                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "20px" }}
                             />
-
                             {/* Left */}
                             <button
                                 onClick={() =>
                                     setCurrentImage(currentImage === 0 ? images.length - 1 : currentImage - 1)
                                 }
                                 style={{
-                                    position: "absolute",
-                                    top: "50%",
-                                    left: "15px",
-                                    transform: "translateY(-50%)",
-                                    background: "rgba(0,0,0,.6)",
+                                    position: "absolute", top: "50%", left: "15px", transform: "translateY(-50%)", background: "rgba(0,0,0,.6)",
                                     border: "none",
                                     color: "#fff",
                                     fontSize: "22px",
                                     padding: "8px 12px",
                                     borderRadius: "8px",
                                     cursor: "pointer"
-                                }}
-                            >
+                                }}>
                                 ‹
                             </button>
-
                             {/* Right */}
                             <button
                                 onClick={() =>
@@ -332,7 +325,7 @@ const VehicleDetails = () => {
                                 fontSize: "22px",
                                 fontWeight: "600"
                             }}>
-                                ₹{totalPrice}
+                                ₹{cost}
                             </span>
                         </div>
 

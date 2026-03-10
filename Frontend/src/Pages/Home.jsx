@@ -11,7 +11,8 @@ const Home = () => {
     destinationCity: '',
     fromDate: '',
     toDate: '',
-    pageNumber: '1'
+    pageNumber: 0,
+    pageSize: 10
   });
 
   const handleChange = (e) => {
