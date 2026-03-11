@@ -1,0 +1,18 @@
+# Environment variables - never commit these
+Backend/.env
+
+# IntelliJ
+.idea/
+*.iml
+
+# Maven
+**/target/
+**/.mvn/
+
+# Node
+Frontend/node_modules/
+Frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db

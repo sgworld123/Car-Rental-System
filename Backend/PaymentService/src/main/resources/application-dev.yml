@@ -4,10 +4,10 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://root:root@localhost:27017/CarRentalSystem?authSource=admin
+      uri: mongodb://root:root@mongodb:27017/CarRentalSystem?authSource=admin
 
   rabbitmq:
-    host: localhost
+    host: rabbitmq
     port: 5672
     username: guest
     password: guest
@@ -17,8 +17,8 @@ server:
 
 eureka:
   instance:
-    ip-address: 127.0.0.1
+    ip-address: payment-service
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka:8761/eureka/

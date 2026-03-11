@@ -5,11 +5,12 @@ spring:
   cache:
     type: redis
 
+  data:
     mongodb:
-      uri: mongodb://root:root@localhost:27017/CarRentalSystem?authSource=admin
+      uri: mongodb://root:root@mongodb:27017/CarRentalSystem?authSource=admin
 
     redis:
-      host: localhost
+      host: redis
       port: 6379
 
 server:
@@ -17,8 +18,8 @@ server:
 
 eureka:
   instance:
-    ip-address: 127.0.0.1
+    ip-address: agency-service
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka:8761/eureka/
