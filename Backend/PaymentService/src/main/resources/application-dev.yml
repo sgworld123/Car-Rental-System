@@ -17,7 +17,7 @@ server:
 
 eureka:
   instance:
-    ip-address: payment-service
+    hostname: payment-service
     prefer-ip-address: true
   client:
     serviceUrl:

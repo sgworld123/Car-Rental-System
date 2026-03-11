@@ -18,7 +18,7 @@ server:
 
 eureka:
   instance:
-    ip-address: agency-service
+    hostname: agency-service
     prefer-ip-address: true
   client:
     serviceUrl:

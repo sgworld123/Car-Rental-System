@@ -41,7 +41,7 @@ server:
 
 eureka:
   instance:
-    ip-address: gateway
+    hostname: gateway
     prefer-ip-address: true
   client:
     serviceUrl:

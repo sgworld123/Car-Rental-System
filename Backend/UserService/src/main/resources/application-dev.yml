@@ -11,7 +11,7 @@ server:
 
 eureka:
   instance:
-    ip-address: user-service
+    hostname: user-service
     prefer-ip-address: true
   client:
     serviceUrl:

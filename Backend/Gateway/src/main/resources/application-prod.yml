@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Dockerfile
+    name: GATEWAY
 
   cloud:
     gateway:

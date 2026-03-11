@@ -25,7 +25,7 @@ server:
 
 eureka:
   instance:
-    ip-address: booking-service
+    hostname: booking-service
     prefer-ip-address: true
   client:
     serviceUrl:
