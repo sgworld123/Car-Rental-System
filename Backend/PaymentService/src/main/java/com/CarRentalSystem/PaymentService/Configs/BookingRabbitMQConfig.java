@@ -41,13 +41,4 @@ public class BookingRabbitMQConfig {
                 .to(bookingExchange())
                 .with(BOOKING_CANCELLED_KEY);
     }
-    @Bean
-    public MessageConverter jsonMessageConverter(){
-        return new Jackson2JsonMessageConverter();
-    }
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory){
-        RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(jsonMessageConverter());
-        return template;
-    }
 }

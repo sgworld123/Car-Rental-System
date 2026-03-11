@@ -34,7 +34,7 @@ public class AuthUtils {
                 .setClaims(claims)
                 .setSubject(authUser.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 30))
                 .signWith(getSecretKey())
                 .compact();
     }

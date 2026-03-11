@@ -1,25 +1,3 @@
 spring:
-  application:
-    name: PAYMENTSERVICE
-
-  data:
-    mongodb:
-      uri: ${MONGODB_URI}
-
-  #RabbitMq
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: ${RABBITMQ_USERNAME}
-    password: ${RABBITMQ_PASSWORD}
-
-server:
-  port: 8085
-
-eureka:
-  instance:
-    ip-address: 127.0.0.1
-    prefer-ip-address: true
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+  profiles:
+    active: prod

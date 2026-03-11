@@ -2,9 +2,16 @@ spring:
   application:
     name: AGENCYSERVICE
 
-  data:
+  cache:
+    type: redis
+
     mongodb:
-      uri: ${MONGODB_URI}
+      uri: mongodb://root:root@localhost:27017/CarRentalSystem?authSource=admin
+
+    redis:
+      host: localhost
+      port: 6379
+
 server:
   port: 8082
 
