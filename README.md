@@ -94,7 +94,7 @@ Car-Rental-System/
 │   ├── AgencyService/       # Agencies + vehicles + search (Port 8082)
 │   ├── BookingService/      # Booking lifecycle + scheduling (Port 8083)
 │   ├── PaymentService/      # Mock payment + refund processing (Port 8085)
-│   └── docker-compose.yaml  # MongoDB, Redis, RabbitMQ
+│   └── docker-compose.yaml  # Full stack orchestration
 └── Frontend/
     ├── src/
     │   ├── Pages/           # Login, Register, Home, AgencyPage, VehicleDetails, MyBookings, Profile
@@ -110,54 +110,42 @@ Car-Rental-System/
 
 ### Prerequisites
 
-- Java 17+
-- Node.js 18+
-- Maven
 - Docker + Docker Compose
+- Node.js 18+ (for frontend only)
 
 ---
 
-### Option A — Local Development (Recommended)
+### Step 1 — Clone the repo
 
-**Step 1 — Start infrastructure**
+```bash
+git clone https://github.com/your-username/Car-Rental-System.git
+cd Car-Rental-System
+```
+
+### Step 2 — Create environment file
+
+Create a `.env` file inside the `Backend/` folder:
+
+```
+JWT_SECRET_KEY2=your-secret-key-here
+```
+
+### Step 3 — Start the entire backend with one command
+
 ```bash
 cd Backend
-docker-compose up -d
-```
-This starts MongoDB (27017), Redis (6379), and RabbitMQ (5672 / management UI: 15672).
-
-**Step 2 — Switch all services to dev profile**
-
-In each service's `src/main/resources/application.yml`, set:
-```yaml
-spring:
-  profiles:
-    active: dev
-```
-Services: `eureka`, `Gateway`, `UserService`, `AgencyService`, `BookingService`, `PaymentService`
-
-**Step 3 — Start backend services (in this order)**
-```bash
-# 1. Eureka
-cd Backend/eureka && mvn spring-boot:run
-
-# 2. Gateway
-cd Backend/Gateway && mvn spring-boot:run
-
-# 3. UserService
-cd Backend/UserService && mvn spring-boot:run
-
-# 4. AgencyService
-cd Backend/AgencyService && mvn spring-boot:run
-
-# 5. BookingService
-cd Backend/BookingService && mvn spring-boot:run
-
-# 6. PaymentService
-cd Backend/PaymentService && mvn spring-boot:run
+docker-compose up --build
 ```
 
-**Step 4 — Start frontend**
+This single command builds and starts everything:
+- MongoDB, Redis, RabbitMQ (infrastructure)
+- Eureka (service registry)
+- Gateway, UserService, AgencyService, BookingService, PaymentService
+
+Wait until you see `Started ... in X seconds` in the logs for all services. Verify everything is up at `http://localhost:8761` — all 5 services should show as UP.
+
+### Step 4 — Start the frontend
+
 ```bash
 cd Frontend
 npm install
@@ -168,9 +156,27 @@ App runs at `http://localhost:5173`
 
 ---
 
+### Useful commands
+
+```bash
+# Run in background
+docker-compose up --build -d
+
+# Stop everything
+docker-compose down
+
+# View logs for a specific service
+docker-compose logs -f booking-service
+
+# Rebuild a single service after code change
+docker-compose up --build booking-service
+```
+
+---
+
 ### Option B — Cloud / Production
 
-Set the following environment variables before starting each service:
+Switch `application.yml` in every service to `active: prod` and set the following environment variables on your deployment platform:
 
 | Variable | Used By | Description |
 |---|---|---|
@@ -178,12 +184,11 @@ Set the following environment variables before starting each service:
 | `REDIS_HOST` | AgencyService, BookingService | Redis Cloud host |
 | `REDIS_PORT` | AgencyService, BookingService | Redis Cloud port |
 | `REDIS_PASSWORD` | AgencyService, BookingService | Redis Cloud password |
+| `RABBITMQ_HOST` | BookingService, PaymentService | RabbitMQ host |
 | `RABBITMQ_USERNAME` | BookingService, PaymentService | RabbitMQ username |
 | `RABBITMQ_PASSWORD` | BookingService, PaymentService | RabbitMQ password |
 | `JWT_SECRET_KEY` | Gateway, UserService | HMAC secret (min 32 chars) |
 | `FRONTEND_URL` | Gateway | Frontend origin for CORS |
-
-Keep `application.yml` on `active: prod` (default).
 
 ---
 
