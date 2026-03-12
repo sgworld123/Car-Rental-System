@@ -125,7 +125,7 @@ const Home = () => {
               style={styles.input}
               type="text"
               name="sourceCity"
-              placeholder="Leaving from..."
+              placeholder="Try Bangalore"
               value={tripData.sourceCity}
               onChange={handleChange}
               required
@@ -138,7 +138,7 @@ const Home = () => {
               style={styles.input}
               type="text"
               name="destinationCity"
-              placeholder="Going to..."
+              placeholder="Try Mumbai"
               value={tripData.destinationCity}
               onChange={handleChange}
               required
@@ -152,6 +152,7 @@ const Home = () => {
               type="date"
               name="fromDate"
               value={tripData.fromDate}
+              min={new Date().toISOString().split("T")[0]}
               onChange={handleChange}
               required
             />
@@ -164,6 +165,7 @@ const Home = () => {
               type="date"
               name="toDate"
               value={tripData.toDate}
+              min={new Date().toISOString().split("T")[0]}
               onChange={handleChange}
               required
             />

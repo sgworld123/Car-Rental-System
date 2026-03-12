@@ -2,6 +2,7 @@ package com.CarRentalSystem.AgencyService.Service;
 
 import com.CarRentalSystem.AgencyService.Dto.*;
 import com.CarRentalSystem.AgencyService.Exceptions.AgencyNotFoundException;
+import com.CarRentalSystem.AgencyService.Exceptions.InvalidDatesException;
 import com.CarRentalSystem.AgencyService.Exceptions.VehicleNotFoundException;
 import com.CarRentalSystem.AgencyService.Model.Agency;
 import com.CarRentalSystem.AgencyService.Model.Vehicle;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -71,6 +73,12 @@ public class AgencyService {
     }
 
     public PagedSearchResponse getAgenciesBySourceCity(SearchRequestDto searchRequestDto) {
+        LocalDate todayDate = LocalDate.now();
+        if(searchRequestDto.getFromDate().isBefore(todayDate) || searchRequestDto.getToDate().isBefore(todayDate))
+        {
+            throw new InvalidDatesException("Invalid Dates Provided. Dates must be in the future.");
+        }
+
         String key = searchRequestDto.getSourceCity() + "_" + searchRequestDto.getPageNumber();
         PagedSearchResponse cachedResponse = (PagedSearchResponse) redisTemplate.opsForValue().get(key);
         if (cachedResponse != null) {

@@ -85,6 +85,20 @@ const VehicleDetails = () => {
 
                 return (
                     <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
+                        {/* Close */}
+                            <span
+                                onClick={() => navigate(-1)}
+                                style={{
+                                    
+                                    top: "14px",
+                                    right: "16px",
+                                    color: "#aaa",
+                                    cursor: "pointer",
+                                    fontSize: "18px"
+                                }}
+                            >
+                                ✕
+                            </span>
 
                         {/* Slider */}
                         <div style={{ position: "relative", width: "100%", height: "380px", marginBottom: "24px" }}>

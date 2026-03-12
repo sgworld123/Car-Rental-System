@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,10 +21,10 @@ public class SearchRequestDto {
     private String destinationCity;
 
     @NotNull(message = "From date is required")
-    private String fromDate;
+    private LocalDate fromDate;
 
     @NotNull(message = "To date is required")
-    private String toDate;
+    private LocalDate toDate;
 
     private int pageNumber = 0;
     private int pageSize = 10;

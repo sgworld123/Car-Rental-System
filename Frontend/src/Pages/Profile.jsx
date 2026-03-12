@@ -18,7 +18,6 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-
   if (loading)
     return (
       <div style={styles.center}>

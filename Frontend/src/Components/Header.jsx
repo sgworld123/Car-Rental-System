@@ -127,7 +127,7 @@ const Header = () => {
               : "text-white hover:bg-purple-500/30"}`
           }
         >
-          Settings
+          About Me
         </NavLink>
       </nav>
 
