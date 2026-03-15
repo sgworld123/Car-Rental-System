@@ -6,6 +6,7 @@ import com.CarRentalSystem.BookingService.Dto.BookingResponseDto;
 import com.CarRentalSystem.BookingService.Dto.RequestId;
 import com.CarRentalSystem.BookingService.Models.Booking;
 import com.CarRentalSystem.BookingService.Service.BookingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class BookingController {
     private final BookingService bookingService;
     @PostMapping
     public ResponseEntity<BookingResponseDto> createBooking(@RequestHeader("X-User-Id") String userId
-            ,@RequestBody BookingRequestDto bookingRequestDto) {
+            ,@Valid @RequestBody BookingRequestDto bookingRequestDto) {
         return ResponseEntity.ok(bookingService.createBooking(userId,bookingRequestDto));
     }
     @PutMapping("/confirm/{bookingId}")

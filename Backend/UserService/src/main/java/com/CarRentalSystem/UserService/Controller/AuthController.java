@@ -5,6 +5,7 @@ import com.CarRentalSystem.UserService.Dto.LoginResponseDto;
 import com.CarRentalSystem.UserService.Dto.SignupRequestDto;
 import com.CarRentalSystem.UserService.Dto.SignupResponseDto;
 import com.CarRentalSystem.UserService.Security.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +19,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto)
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequestDto)
     {
         return ResponseEntity.ok(authService.login(loginRequestDto));
     }
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponseDto> signup(@RequestBody SignupRequestDto signupRequestDto)
+    public ResponseEntity<SignupResponseDto> signup(@Valid @RequestBody SignupRequestDto signupRequestDto)
     {
         return ResponseEntity.ok(authService.signup(signupRequestDto));
     }

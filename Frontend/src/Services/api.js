@@ -41,7 +41,7 @@ api.interceptors.response.use(
                 // Refresh token expired → force logout
                 localStorage.removeItem("token");
                 localStorage.removeItem("refreshToken");
-                window.location.href = "/login";
+                window.location.href = "/";
             }
         }
 
