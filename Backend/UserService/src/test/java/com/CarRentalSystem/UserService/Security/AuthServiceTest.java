@@ -4,10 +4,13 @@ import com.CarRentalSystem.UserService.Dto.LoginRequestDto;
 import com.CarRentalSystem.UserService.Dto.LoginResponseDto;
 import com.CarRentalSystem.UserService.Dto.SignupRequestDto;
 import com.CarRentalSystem.UserService.Dto.SignupResponseDto;
+import com.CarRentalSystem.UserService.Exceptions.UserNameAlreadyTakenException;
 import com.CarRentalSystem.UserService.Model.AuthUser;
 import com.CarRentalSystem.UserService.Model.User;
 import com.CarRentalSystem.UserService.Repository.AuthUserRepository;
 import com.CarRentalSystem.UserService.Repository.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,24 +46,38 @@ class AuthServiceTest {
     // ─────────────────────────────────────────────
 
     @Test
-    @DisplayName("login – valid credentials return JWT and user ID")
-    void login_validCredentials_returnsToken() {
-        AuthUser authUser = AuthUser.builder()
-                .Id("auth-001")
-                .username("alice")
-                .password("encoded")
-                .role("USER")
-                .build();
+    @DisplayName("login – valid credentials return accessToken, refreshToken, and userId")
+    void login_validCredentials_returnsBothTokens() {
+        AuthUser authUser = buildAuthUser("auth-001", "alice");
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(authentication);
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authUser);
-        when(authUtils.generateAccessToken(authUser)).thenReturn("mocked.jwt.token");
+        when(authUtils.generateAccessToken(authUser)).thenReturn("access.token");
+        when(authUtils.generateRefreshToken(authUser)).thenReturn("refresh.token");
+        when(authUserRepository.save(any())).thenReturn(authUser);
 
         LoginResponseDto response = authService.login(new LoginRequestDto("alice", "password"));
 
-        assertThat(response.getJwt()).isEqualTo("mocked.jwt.token");
+        assertThat(response.getJwt()).isEqualTo("access.token");
+        assertThat(response.getRefreshToken()).isEqualTo("refresh.token");
         assertThat(response.getId()).isEqualTo("auth-001");
+    }
+
+    @Test
+    @DisplayName("login – refresh token is saved to AuthUser in DB")
+    void login_refreshToken_savedToDb() {
+        AuthUser authUser = buildAuthUser("auth-001", "alice");
+
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(authUser);
+        when(authUtils.generateAccessToken(authUser)).thenReturn("access.token");
+        when(authUtils.generateRefreshToken(authUser)).thenReturn("refresh.token");
+        when(authUserRepository.save(any())).thenReturn(authUser);
+
+        authService.login(new LoginRequestDto("alice", "password"));
+
+        // Verify the user was saved with the refresh token set
+        verify(authUserRepository).save(argThat(u -> "refresh.token".equals(u.getRefreshToken())));
     }
 
     @Test
@@ -82,23 +98,16 @@ class AuthServiceTest {
     @DisplayName("signup – new user creates AuthUser and User records")
     void signup_newUser_success() {
         SignupRequestDto req = SignupRequestDto.builder()
-                .username("bob")
-                .password("pass123")
-                .email("bob@example.com")
-                .phone("9876543210")
+                .username("bob").password("pass123")
+                .email("bob@example.com").phone("9876543210")
                 .build();
 
-        AuthUser savedAuthUser = AuthUser.builder()
-                .Id("auth-002")
-                .username("bob")
-                .password("encoded-pass")
-                .role("USER")
-                .build();
+        AuthUser savedAuthUser = buildAuthUser("auth-002", "bob");
 
         when(authUserRepository.findByUsername("bob")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("pass123")).thenReturn("encoded-pass");
-        when(authUserRepository.save(any(AuthUser.class))).thenReturn(savedAuthUser);
-        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+        when(authUserRepository.save(any())).thenReturn(savedAuthUser);
+        when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         SignupResponseDto response = authService.signup(req);
 
@@ -109,14 +118,14 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("signup – duplicate username throws RuntimeException")
+    @DisplayName("signup – duplicate username throws UserNameAlreadyTakenException")
     void signup_duplicateUsername_throws() {
         when(authUserRepository.findByUsername("alice"))
-                .thenReturn(Optional.of(AuthUser.builder().username("alice").build()));
+                .thenReturn(Optional.of(buildAuthUser("auth-001", "alice")));
 
         assertThatThrownBy(() -> authService.signup(
                 SignupRequestDto.builder().username("alice").password("x").build()))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(UserNameAlreadyTakenException.class)
                 .hasMessageContaining("Username already taken");
 
         verify(authUserRepository, never()).save(any());
@@ -124,9 +133,9 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("signup – password is encoded, never stored as plaintext")
-    void signup_passwordIsEncoded_notPlaintext() {
-        AuthUser saved = AuthUser.builder().Id("auth-003").username("carol").build();
+    @DisplayName("signup – password is BCrypt encoded, never stored as plaintext")
+    void signup_passwordIsEncoded() {
+        AuthUser saved = buildAuthUser("auth-003", "carol");
 
         when(authUserRepository.findByUsername("carol")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("plaintext")).thenReturn("hashed-pass");
@@ -143,7 +152,7 @@ class AuthServiceTest {
     @Test
     @DisplayName("signup – User profile is linked to AuthUser via authId")
     void signup_userLinkedToAuthUser() {
-        AuthUser saved = AuthUser.builder().Id("auth-xyz").username("dave").build();
+        AuthUser saved = buildAuthUser("auth-xyz", "dave");
 
         when(authUserRepository.findByUsername("dave")).thenReturn(Optional.empty());
         when(passwordEncoder.encode(any())).thenReturn("encoded");
@@ -151,9 +160,120 @@ class AuthServiceTest {
         when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         authService.signup(SignupRequestDto.builder()
-                .username("dave").password("pass").email("dave@d.com").phone("123").build());
+                .username("dave").password("pass").email("d@d.com").phone("123").build());
 
-        // The User's authId must match the saved AuthUser's ID
         verify(userRepository).save(argThat(u -> "auth-xyz".equals(u.getAuthId())));
+    }
+
+    @Test
+    @DisplayName("signup – role is set to USER by default")
+    void signup_roleSetToUser() {
+        AuthUser saved = buildAuthUser("auth-004", "eve");
+
+        when(authUserRepository.findByUsername("eve")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(any())).thenReturn("encoded");
+        when(authUserRepository.save(any())).thenReturn(saved);
+        when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        authService.signup(SignupRequestDto.builder()
+                .username("eve").password("pass").email("e@e.com").build());
+
+        verify(authUserRepository).save(argThat(u -> "USER".equals(u.getRole())));
+    }
+
+    // ─────────────────────────────────────────────
+    // refresh
+    // ─────────────────────────────────────────────
+
+    @Test
+    @DisplayName("refresh – valid refresh token returns new access token")
+    void refresh_validToken_returnsNewAccessToken() {
+        AuthUser authUser = buildAuthUser("auth-001", "alice");
+        authUser.setRefreshToken("valid.refresh.token");
+
+        Claims claims = mock(Claims.class);
+        when(claims.getSubject()).thenReturn("alice");
+        when(authUtils.extractClaims("valid.refresh.token")).thenReturn(claims);
+        when(authUserRepository.findByUsername("alice")).thenReturn(Optional.of(authUser));
+        when(authUtils.generateAccessToken(authUser)).thenReturn("new.access.token");
+
+        LoginResponseDto result = authService.refresh("valid.refresh.token");
+
+        assertThat(result.getJwt()).isEqualTo("new.access.token");
+        assertThat(result.getRefreshToken()).isEqualTo("valid.refresh.token");
+        assertThat(result.getId()).isEqualTo("auth-001");
+    }
+
+    @Test
+    @DisplayName("refresh – token not matching stored token throws RuntimeException")
+    void refresh_tokenMismatch_throws() {
+        AuthUser authUser = buildAuthUser("auth-001", "alice");
+        authUser.setRefreshToken("stored.token");
+
+        Claims claims = mock(Claims.class);
+        when(claims.getSubject()).thenReturn("alice");
+        when(authUtils.extractClaims("different.token")).thenReturn(claims);
+        when(authUserRepository.findByUsername("alice")).thenReturn(Optional.of(authUser));
+
+        assertThatThrownBy(() -> authService.refresh("different.token"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Invalid refresh token");
+    }
+
+    @Test
+    @DisplayName("refresh – unknown username throws RuntimeException")
+    void refresh_unknownUser_throws() {
+        Claims claims = mock(Claims.class);
+        when(claims.getSubject()).thenReturn("ghost");
+        when(authUtils.extractClaims("any.token")).thenReturn(claims);
+        when(authUserRepository.findByUsername("ghost")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.refresh("any.token"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("User not found");
+    }
+
+    @Test
+    @DisplayName("refresh – expired refresh token throws RuntimeException (not 500)")
+    void refresh_expiredToken_throwsRuntimeException() {
+        when(authUtils.extractClaims("expired.token"))
+                .thenThrow(mock(ExpiredJwtException.class));
+
+        // Should throw RuntimeException, not the raw ExpiredJwtException
+        // so GlobalExceptionHandler can return 400 instead of 500
+        assertThatThrownBy(() -> authService.refresh("expired.token"))
+                .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    @DisplayName("refresh – refresh does not generate a new refresh token (same token reused)")
+    void refresh_doesNotRotateRefreshToken() {
+        AuthUser authUser = buildAuthUser("auth-001", "alice");
+        authUser.setRefreshToken("same.refresh.token");
+
+        Claims claims = mock(Claims.class);
+        when(claims.getSubject()).thenReturn("alice");
+        when(authUtils.extractClaims("same.refresh.token")).thenReturn(claims);
+        when(authUserRepository.findByUsername("alice")).thenReturn(Optional.of(authUser));
+        when(authUtils.generateAccessToken(any())).thenReturn("new.access.token");
+
+        LoginResponseDto result = authService.refresh("same.refresh.token");
+
+        // Refresh token should be the same — not rotated
+        assertThat(result.getRefreshToken()).isEqualTo("same.refresh.token");
+        verify(authUtils, never()).generateRefreshToken(any());
+    }
+
+    // ─────────────────────────────────────────────
+    // Helper
+    // ─────────────────────────────────────────────
+
+    private AuthUser buildAuthUser(String id, String username) {
+        return AuthUser.builder()
+                .Id(id)
+                .username(username)
+                .password("encoded")
+                .role("USER")
+                .build();
     }
 }

@@ -1,6 +1,7 @@
 package com.CarRentalSystem.UserService.Service;
 
 import com.CarRentalSystem.UserService.Dto.ProfileDto;
+import com.CarRentalSystem.UserService.Exceptions.UserNotFoundException;
 import com.CarRentalSystem.UserService.Model.User;
 import com.CarRentalSystem.UserService.Repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -15,25 +16,22 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
 
-    @InjectMocks
-    private UserService userService;
+    @InjectMocks private UserService userService;
 
     // ─────────────────────────────────────────────
     // validateUser
     // ─────────────────────────────────────────────
 
     @Test
-    @DisplayName("validateUser – returns true when user exists by ID")
+    @DisplayName("validateUser – returns true when user exists")
     void validateUser_exists_returnsTrue() {
-        when(userRepository.findById("user-1"))
-                .thenReturn(Optional.of(User.builder().id("user-1").build()));
+        User user = User.builder().id("user-1").authId("auth-1").build();
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
 
         assertThat(userService.validateUser("user-1")).isTrue();
     }
@@ -51,49 +49,64 @@ class UserServiceTest {
     // ─────────────────────────────────────────────
 
     @Test
-    @DisplayName("returnProfile – returns correct profile fields for valid authId")
-    void returnProfile_valid_returnsProfile() {
+    @DisplayName("returnProfile – returns correct profile DTO for existing user")
+    void returnProfile_found_returnsProfileDto() {
         User user = User.builder()
-                .authId("auth-001")
-                .name("Alice")
-                .email("alice@example.com")
+                .id("user-1")
+                .authId("auth-1")
+                .name("Vibhu")
+                .email("vibhu@example.com")
                 .phone("9876543210")
                 .build();
 
-        when(userRepository.findByAuthId("auth-001")).thenReturn(Optional.of(user));
+        when(userRepository.findByAuthId("auth-1")).thenReturn(Optional.of(user));
 
-        ProfileDto profile = userService.returnProfile("auth-001");
+        ProfileDto result = userService.returnProfile("auth-1");
 
-        assertThat(profile.getName()).isEqualTo("Alice");
-        assertThat(profile.getEmail()).isEqualTo("alice@example.com");
-        assertThat(profile.getPhone()).isEqualTo("9876543210");
+        assertThat(result.getName()).isEqualTo("Vibhu");
+        assertThat(result.getEmail()).isEqualTo("vibhu@example.com");
+        assertThat(result.getPhone()).isEqualTo("9876543210");
     }
 
     @Test
-    @DisplayName("returnProfile – throws RuntimeException when authId not found")
-    void returnProfile_notFound_throws() {
-        when(userRepository.findByAuthId("bad-id")).thenReturn(Optional.empty());
+    @DisplayName("returnProfile – all fields correctly mapped from User to ProfileDto")
+    void returnProfile_allFieldsMapped() {
+        User user = User.builder()
+                .authId("auth-2")
+                .name("Alice")
+                .email("alice@test.com")
+                .phone("1234567890")
+                .build();
 
-        assertThatThrownBy(() -> userService.returnProfile("bad-id"))
-                .isInstanceOf(RuntimeException.class)
+        when(userRepository.findByAuthId("auth-2")).thenReturn(Optional.of(user));
+
+        ProfileDto result = userService.returnProfile("auth-2");
+
+        // Verify no field is null (all 3 profile fields present)
+        assertThat(result.getName()).isNotNull();
+        assertThat(result.getEmail()).isNotNull();
+        assertThat(result.getPhone()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("returnProfile – throws UserNotFoundException when user not found by authId")
+    void returnProfile_notFound_throws() {
+        when(userRepository.findByAuthId("missing-auth")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.returnProfile("missing-auth"))
+                .isInstanceOf(UserNotFoundException.class)
                 .hasMessageContaining("User not found");
     }
 
     @Test
-    @DisplayName("returnProfile – profile fields are correctly mapped from User model")
-    void returnProfile_fieldMapping_noCrossContamination() {
-        User user = User.builder()
-                .authId("auth-002")
-                .name("Bob")
-                .email("bob@test.com")
-                .phone("1234567890")
-                .build();
+    @DisplayName("returnProfile – does not call findById, only findByAuthId")
+    void returnProfile_usesAuthId_notId() {
+        User user = User.builder().authId("auth-3").name("Bob").email("bob@b.com").phone("111").build();
+        when(userRepository.findByAuthId("auth-3")).thenReturn(Optional.of(user));
 
-        when(userRepository.findByAuthId("auth-002")).thenReturn(Optional.of(user));
+        userService.returnProfile("auth-3");
 
-        ProfileDto profile = userService.returnProfile("auth-002");
-
-        assertThat(profile.getName()).isEqualTo("Bob");
-        assertThat(profile.getEmail()).doesNotContain("alice");
+        verify(userRepository).findByAuthId("auth-3");
+        verify(userRepository, never()).findById(any());
     }
 }
