@@ -290,7 +290,6 @@ Tests cover service layer (unit tests with Mockito) and controller layer (MockMv
 
 - Payment is mocked via `MockPaymentProvider` — real payment gateway integration (Razorpay/Stripe) planned
 - Cost calculation currently uses `pricePerKm × days` — Google Maps Distance Matrix API integration planned for actual route distance
-- No refresh token mechanism — JWT expiry requires re-login
 - Search currently filters by source city only — destination city filter planned
 - No admin panel for agency management
 
