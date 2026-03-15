@@ -70,7 +70,7 @@ class BookingServiceTest {
         BookingResponseDto response = bookingService.createBooking(USER_ID, requestDto);
 
         assertThat(response.getBookingStatus()).isEqualTo("PENDING");
-        assertThat(response.getTotalCost()).isEqualTo(500.0); // 3 days × 500
+        assertThat(response.getTotalCost()).isEqualTo(1500.0); // 3 days × 500
         assertThat(response.getBookingId()).isNotNull();
         // One BookedVehicleAndDates record per day (3 days)
         verify(bookedVehicleAndDatesRepository, times(3)).save(any(BookedVehicleAndDates.class));

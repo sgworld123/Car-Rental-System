@@ -67,7 +67,7 @@ public class BookingService {
                 .bookingId(bookingId)
                 .userId(userId)
                 .vehicleId(bookingRequestDto.getVehicleId())
-                .cost(bookingRequestDto.getCost())
+                .cost(getCost(bookingRequestDto))
                 .fromDate(bookingRequestDto.getFromDate())
                 .endDate(bookingRequestDto.getToDate())
                 .createdAt(LocalDateTime.now())
