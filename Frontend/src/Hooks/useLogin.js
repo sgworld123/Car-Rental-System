@@ -16,7 +16,7 @@ export function useLogin() {
             console.log("LOGIN RESPONSE:", response.data); // 👈 ADD
 
             localStorage.setItem("token", response.data.jwt);
-            localStorage.setItem("refreshToken", data.refreshToken);
+            localStorage.setItem("refreshToken", response.data.refreshToken);
             return true;
         }
         catch (err) {
