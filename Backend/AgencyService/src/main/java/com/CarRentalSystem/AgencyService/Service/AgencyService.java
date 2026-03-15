@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +42,7 @@ public class AgencyService {
 
         List<Vehicle> vehicles = agencyRegisterRequestDto.getVehicleInfo().stream()
                 .map(v -> Vehicle.builder()
-                        .vehicleId("Veh" + (int)(Math.random() * 10000000))
+                        .vehicleId(UUID.randomUUID().toString())
                         .carModel(v.getCarModel())
                         .pricePerKm(v.getPricePerKm())
                         .carNumber(v.getCarNumber())

@@ -1,6 +1,8 @@
 package com.CarRentalSystem.UserService.Security;
 
+import com.CarRentalSystem.UserService.Exceptions.ExpiredJwtException;
 import com.CarRentalSystem.UserService.Exceptions.UserNameAlreadyTakenException;
+import com.CarRentalSystem.UserService.Exceptions.UserNotFoundException;
 import com.CarRentalSystem.UserService.Repository.AuthUserRepository;
 import com.CarRentalSystem.UserService.Repository.UserRepository;
 import com.CarRentalSystem.UserService.Dto.LoginRequestDto;
@@ -86,10 +88,10 @@ public class AuthService {
         String username = claims.getSubject();
 
         AuthUser authUser = authUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (!refreshToken.equals(authUser.getRefreshToken())) {
-            throw new RuntimeException("Invalid refresh token");
+            throw new ExpiredJwtException("Invalid refresh token");
         }
         String newAccessToken = authUtils.generateAccessToken(authUser);
 

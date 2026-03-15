@@ -70,41 +70,6 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.totalCost").value(1200.0));
     }
 
-//    @Test
-//    @DisplayName("PUT /api/booking/confirm/{id} – returns CONFIRMED status")
-//    void confirmBooking_returns200() throws Exception {
-//        BookingResponseDto resp = BookingResponseDto.builder()
-//                .bookingId("book-xyz")
-//                .bookingStatus("CONFIRMED")
-//                .totalCost(1200.0)
-//                .build();
-//
-//        when(bookingService.confirmBooking("book-xyz")).thenReturn(resp);
-//
-//        mockMvc.perform(put("/api/booking/confirm/book-xyz"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.bookingStatus").value("CONFIRMED"));
-//    }
-
-//    @Test
-//    @DisplayName("PUT /api/booking/cancel – now requires X-User-Id header for ownership check")
-//    void cancelBooking_withUserId_returns200() throws Exception {
-//        Booking cancelled = Booking.builder()
-//                .bookingId("book-xyz")
-//                .status(BookingStatus.CANCELLED)
-//                .build();
-//
-//        // v2: cancelBooking now takes userId as first arg
-//        when(bookingService.cancelBooking(eq("user-1"), any(RequestId.class))).thenReturn(cancelled);
-//
-//        mockMvc.perform(put("/api/booking/cancel")
-//                        .header("X-User-Id", "user-1")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(new RequestId("book-xyz"))))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.status").value("CANCELLED"));
-//    }
-
     @Test
     @DisplayName("GET /api/booking/my – returns user's booking list")
     void getBooking_returnsUserBookings() throws Exception {

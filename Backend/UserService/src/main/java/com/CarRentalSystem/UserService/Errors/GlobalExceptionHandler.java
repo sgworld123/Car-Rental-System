@@ -1,5 +1,6 @@
 package com.CarRentalSystem.UserService.Errors;
 
+import com.CarRentalSystem.UserService.Exceptions.ExpiredJwtException;
 import com.CarRentalSystem.UserService.Exceptions.UserNameAlreadyTakenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,14 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(UserNameAlreadyTakenException.class)
     public ResponseEntity<ApiErrorDto> handleUserNameAlreadyTakenException(UserNameAlreadyTakenException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorDto.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.BAD_REQUEST)
+                .timestamp(java.time.LocalDateTime.now())
+                .build());
+    }
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ApiErrorDto> handleExpiredJwtException(ExpiredJwtException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorDto.builder()
                 .message(ex.getMessage())
                 .status(HttpStatus.BAD_REQUEST)

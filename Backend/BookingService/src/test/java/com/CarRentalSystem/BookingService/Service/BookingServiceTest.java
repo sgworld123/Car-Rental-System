@@ -123,58 +123,6 @@ class BookingServiceTest {
         verify(bookedVehicleAndDatesRepository, times(1)).save(any());
     }
 
-    // ─────────────────────────────────────────────
-    // confirmBooking
-    // ─────────────────────────────────────────────
-
-//    @Test
-//    @DisplayName("confirmBooking – valid Redis hold sets status to CONFIRMED and deletes hold keys")
-//    void confirmBooking_success() {
-//        String bookingId = "book-999";
-//        Booking booking = buildBooking(bookingId, USER_ID, BookingStatus.PENDING, FROM, TO);
-//
-//        when(bookingRepository.findByBookingId(bookingId)).thenReturn(Optional.of(booking));
-//        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-//        when(valueOperations.get(anyString())).thenReturn(bookingId);
-//        when(bookingRepository.save(any())).thenAnswer(i -> i.getArgument(0));
-//
-//        BookingResponseDto response = bookingService.confirmBooking(bookingId);
-//
-//        assertThat(response.getBookingStatus()).isEqualTo("CONFIRMED");
-//        assertThat(booking.getStatus()).isEqualTo(BookingStatus.CONFIRMED);
-//        verify(redisTemplate, times(3)).delete(anyString()); // one delete per day
-//    }
-
-//    @Test
-//    @DisplayName("confirmBooking – throws when booking not found")
-//    void confirmBooking_notFound_throws() {
-//        when(bookingRepository.findByBookingId("ghost")).thenReturn(Optional.empty());
-//
-//        assertThatThrownBy(() -> bookingService.confirmBooking("ghost"))
-//                .isInstanceOf(RuntimeException.class)
-//                .hasMessageContaining("No such booking found");
-//    }
-
-//    @Test
-//    @DisplayName("confirmBooking – throws when Redis key is held by a different booking")
-//    void confirmBooking_heldByOtherBooking_throws() {
-//        String bookingId = "book-999";
-//        Booking booking = buildBooking(bookingId, USER_ID, BookingStatus.PENDING, FROM, FROM);
-//
-//        when(bookingRepository.findByBookingId(bookingId)).thenReturn(Optional.of(booking));
-//        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-//        when(valueOperations.get(anyString())).thenReturn("different-booking-id");
-//
-//        assertThatThrownBy(() -> bookingService.confirmBooking(bookingId))
-//                .isInstanceOf(RuntimeException.class)
-//                .hasMessageContaining("Booking not held for");
-//    }
-
-    // ─────────────────────────────────────────────
-    // cancelBooking (v2 — accepts userId for ownership check)
-    // ─────────────────────────────────────────────
-
-
     @Test
     @DisplayName("cancelBooking – cleans up BookedVehicleAndDates and Redis hold keys")
     void cancelBooking_cleansUpResources() {

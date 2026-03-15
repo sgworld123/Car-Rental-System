@@ -6,9 +6,10 @@ import com.CarRentalSystem.AgencyService.Exceptions.VehicleNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(AgencyNotFoundException.class)
     public ResponseEntity<ErrorDto> handleAgencyNotFoundException(AgencyNotFoundException ex) {
@@ -26,7 +27,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(InvalidDatesException.class)
     public ResponseEntity<ErrorDto> invalidDatesException(InvalidDatesException ex) {
-        return ResponseEntity.status(404).body(ErrorDto.builder()
+        return ResponseEntity.status(400).body(ErrorDto.builder()
                 .message(ex.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build());
