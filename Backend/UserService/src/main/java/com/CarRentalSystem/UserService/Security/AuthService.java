@@ -9,6 +9,7 @@ import com.CarRentalSystem.UserService.Dto.SignupRequestDto;
 import com.CarRentalSystem.UserService.Dto.SignupResponseDto;
 import com.CarRentalSystem.UserService.Model.AuthUser;
 import com.CarRentalSystem.UserService.Model.User;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,15 +30,21 @@ public class AuthService {
     private final UserRepository userRepository;
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(),loginRequestDto.getPassword())
+                new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername()
+                        ,loginRequestDto.getPassword())
         );
 
         AuthUser authUser = (AuthUser) authentication.getPrincipal();
 
         String token = authUtils.generateAccessToken(authUser);
+        String refreshToken = authUtils.generateRefreshToken(authUser);
+
+        authUser.setRefreshToken(refreshToken);
+        authUserRepository.save(authUser);
 
         return LoginResponseDto.builder()
                 .jwt(token)
+                .refreshToken(refreshToken)
                 .id(authUser.getId())
                 .build();
     }
@@ -71,6 +78,25 @@ public class AuthService {
         return SignupResponseDto.builder()
                 .id(authUser.getId())
                 .username(authUser.getUsername())
+                .build();
+    }
+    public LoginResponseDto refresh(String refreshToken) {
+        // Validate the token
+        Claims claims = authUtils.extractClaims(refreshToken);
+        String username = claims.getSubject();
+
+        AuthUser authUser = authUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!refreshToken.equals(authUser.getRefreshToken())) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+        String newAccessToken = authUtils.generateAccessToken(authUser);
+
+        return LoginResponseDto.builder()
+                .jwt(newAccessToken)
+                .refreshToken(refreshToken)
+                .id(authUser.getId())
                 .build();
     }
 

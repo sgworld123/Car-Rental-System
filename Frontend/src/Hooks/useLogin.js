@@ -16,9 +16,7 @@ export function useLogin() {
             console.log("LOGIN RESPONSE:", response.data); // 👈 ADD
 
             localStorage.setItem("token", response.data.jwt);
-            // console.log('Login ongoing', { username, password });
-            // const response = await loginFun({ username, password });
-            // localStorage.setItem('token', response.data.token);
+            localStorage.setItem("refreshToken", data.refreshToken);
             return true;
         }
         catch (err) {

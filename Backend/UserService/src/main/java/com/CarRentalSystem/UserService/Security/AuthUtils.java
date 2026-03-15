@@ -45,4 +45,16 @@ public class AuthUtils {
                 .parseClaimsJws(jwtToken)
                 .getBody();
     }
+    public String generateRefreshToken(AuthUser authUser)
+    {
+        HashMap<String,Object> claims = new HashMap<>();
+        claims.put("userId",authUser.getId());
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(authUser.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7))
+                .signWith(getSecretKey())
+                .compact();
+    }
 }

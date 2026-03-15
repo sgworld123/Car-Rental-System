@@ -4,18 +4,49 @@ const api = axios.create({
     baseURL: "http://localhost:8090"
 });
 
+// Attach access token to every request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
-  const isAuthRoute = config.url.includes("/api/auth");
-
-  if (token && !isAuthRoute) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
+    const token = localStorage.getItem("token");
+    const isAuthRoute = config.url.includes("/api/auth");
+    if (token && !isAuthRoute) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
 });
 
+// Auto-refresh when access token expires
+api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const original = error.config;
 
+        if (error.response?.status === 401 && !original._retry) {
+            original._retry = true;
+
+            try {
+                const refreshToken = localStorage.getItem("refreshToken");
+                const { data } = await axios.post(
+                    "http://localhost:8090/api/auth/refresh",
+                    { refreshToken }
+                );
+
+                // Save new access token
+                localStorage.setItem("token", data.jwt);
+
+                // Retry original request with new token
+                original.headers.Authorization = `Bearer ${data.jwt}`;
+                return api(original);
+
+            } catch (err) {
+                // Refresh token expired → force logout
+                localStorage.removeItem("token");
+                localStorage.removeItem("refreshToken");
+                window.location.href = "/login";
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
 
 export default api;

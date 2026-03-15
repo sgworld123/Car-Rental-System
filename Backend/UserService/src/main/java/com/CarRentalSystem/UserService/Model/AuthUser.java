@@ -51,6 +51,7 @@ public class AuthUser implements UserDetails {
     private String password;
     @NotBlank
     private String role;
+    private String refreshToken;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role));
