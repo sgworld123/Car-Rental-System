@@ -67,6 +67,27 @@ AgencyService + BookingService use Redis for caching and distributed locking.
 
 ---
 
+## 📊 Performance
+
+Load tested with [k6](https://k6.io) under **50 concurrent virtual users for 30 seconds**.
+
+| Metric | Result |
+|---|---|
+| Total Requests | 1,567 |
+| Throughput | ~50 requests/sec |
+| Avg Response Time | 481ms |
+| Min Response Time | 16ms (Redis cache hit) |
+| p(90) Response Time | 848ms |
+| Failure Rate | 0% |
+
+Endpoints tested:
+- `POST /api/agency/search` — paginated agency search with Redis caching
+- `GET /api/user/profile` — authenticated user profile retrieval
+
+> Tested on local Docker Compose stack (6 services + MongoDB + Redis + RabbitMQ) running on a development machine. Production performance would be significantly higher.
+
+---
+
 ## 🛠 Tech Stack
 
 | Layer | Technology |
@@ -77,7 +98,7 @@ AgencyService + BookingService use Redis for caching and distributed locking.
 | Messaging | RabbitMQ (with Dead Letter Queues) |
 | Cache / Locking | Redis |
 | Database | MongoDB |
-| Auth | JWT (HMAC-SHA256) |
+| Auth | JWT with Refresh Token Rotation (HMAC-SHA512) |
 | Build | Maven |
 | Infrastructure | Docker, Docker Compose |
 
@@ -98,9 +119,9 @@ Car-Rental-System/
 └── Frontend/
     ├── src/
     │   ├── Pages/           # Login, Register, Home, AgencyPage, VehicleDetails, MyBookings, Profile
-    │   ├── Components/      # Header, Sidebar, Footer
+    │   ├── Components/      # Header, Sidebar, Footer, ProtectedRoute
     │   ├── Hooks/           # Custom React hooks
-    │   └── Services/        # Axios API calls
+    │   └── Services/        # Axios API calls with auto token refresh
     └── package.json
 ```
 
@@ -127,7 +148,7 @@ cd Car-Rental-System
 Create a `.env` file inside the `Backend/` folder:
 
 ```
-JWT_SECRET_KEY2=your-secret-key-here
+JWT_SECRET_KEY2=your-secret-key-minimum-32-characters-long
 ```
 
 ### Step 3 — Start the entire backend with one command
@@ -201,7 +222,8 @@ All endpoints except `/api/auth/**` require `Authorization: Bearer <token>` head
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/api/auth/signup` | Register new user |
-| POST | `/api/auth/login` | Login, returns JWT |
+| POST | `/api/auth/login` | Login, returns access token + refresh token |
+| POST | `/api/auth/refresh` | Exchange refresh token for new access token |
 
 ### User — `/api/user`
 | Method | Endpoint | Description |
@@ -247,6 +269,8 @@ All endpoints except `/api/auth/**` require `Authorization: Bearer <token>` head
 ## 🔐 Security
 
 - JWT tokens are validated at the Gateway before forwarding to any service
+- **30-minute access tokens** + **7-day refresh tokens** with rotation stored in MongoDB
+- Frontend axios interceptor automatically refreshes expired tokens and retries the original request
 - Gateway injects `X-User-Id` and `X-Username` headers for downstream services
 - All booking operations verify the requesting user owns the booking
 - Passwords are BCrypt encoded
@@ -262,9 +286,15 @@ cd Backend/BookingService && mvn test
 
 # UserService
 cd Backend/UserService && mvn test
+
+# AgencyService
+cd Backend/AgencyService && mvn test
+
+# PaymentService
+cd Backend/PaymentService && mvn test
 ```
 
-Tests cover service layer (unit tests with Mockito) and controller layer (MockMvc).
+Tests cover service layer (unit tests with Mockito) and controller layer (MockMvc) across all 4 services — 35+ test cases covering Redis locking rollback, RabbitMQ event publishing, JWT refresh token rotation, and booking lifecycle across 6 status transitions.
 
 ---
 
