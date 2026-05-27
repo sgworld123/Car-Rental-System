@@ -2,6 +2,7 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/Backend/AgencyService/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Backend/AuthService/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Backend/BookingService/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Backend/Gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Backend/PaymentService/src/main/java" charset="UTF-8" />

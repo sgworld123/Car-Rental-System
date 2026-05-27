@@ -1,0 +1,202 @@
+.page {
+  min-height: 100vh;
+  background: #050505;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Poppins", sans-serif;
+  color: white;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  opacity: 0.22;
+}
+
+.glow {
+  position: absolute;
+  top: -180px;
+  right: -120px;
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(
+    circle,
+    rgba(241,216,189,0.12),
+    transparent 70%
+  );
+}
+
+.card {
+  width: 410px;
+  background: rgba(18,18,18,0.96);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  box-shadow:
+    0 24px 70px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.banner {
+  height: 150px;
+  background:
+    linear-gradient(
+      rgba(241,216,189,0.04),
+      rgba(241,216,189,0.04)
+    ),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.015),
+      rgba(255,255,255,0.015) 12px,
+      transparent 12px,
+      transparent 24px
+    ),
+    #3b2e28;
+}
+
+.avatar {
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: #f1d8bd;
+  border: 8px solid #121212;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -56px auto 0;
+  position: relative;
+  z-index: 3;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+}
+
+.avatar span {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.content {
+  padding: 22px 28px 32px;
+  text-align: center;
+}
+
+.content h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  color: #f5f5f5;
+}
+
+.email {
+  color: #a8a8a8;
+  font-size: 1rem;
+  margin-bottom: 34px;
+}
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.phone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #d8d8d8;
+  font-size: 0.95rem;
+}
+
+.phone svg {
+  color: #f1d8bd;
+}
+
+.verified {
+  padding: 7px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #f1d8bd;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.editBtn {
+  width: 100%;
+  height: 54px;
+  margin-top: 34px;
+  border-radius: 14px;
+  border: 1px solid rgba(241,216,189,0.7);
+  background: transparent;
+  color: #f1d8bd;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  font-family: inherit;
+}
+
+.editBtn:hover {
+  background: rgba(241,216,189,0.08);
+}
+
+.stats {
+  height: 96px;
+  background: rgba(255,255,255,0.03);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats h2 {
+  font-size: 1.4rem;
+  color: #f3dec8;
+  margin-bottom: 4px;
+}
+
+.stats p {
+  color: #9d9d9d;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 520px) {
+  .card {
+    width: calc(100% - 32px);
+  }
+
+  .content h1 {
+    font-size: 1.8rem;
+  }
+
+  .contactRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stats h2 {
+    font-size: 1.7rem;
+  }
+}

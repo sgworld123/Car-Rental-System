@@ -1,16 +1,16 @@
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
 
-import Login from './Pages/Login'
-import Register from './Pages/Register'
-import Home from './Pages/Home'
+import Login from './Pages/LoginPage/Login'
+import Register from './Pages/RegisterPage/Register'
+import Home from './Pages/HomePage/Home'
 import DashBoardLayout from './Pages/DashBoardLayout'
-import AgencyPage from './Pages/AgencyPage'
+import AgencyPage from './Pages/AgencyPage/AgencyPage'
 import { ConfirmBooking } from './Pages/ConfirmBooking'
-import VehicleDetails from './Pages/VehicleDetails'
-import MyBookings from './Pages/MyBookings'
-import Profile from './Pages/Profile'
-import AboutMe from './Pages/AboutMe'
+import VehicleDetails from './Pages/VehicleDetails/VehicleDetails'
+import MyBookings from './Pages/MyBookings/MyBookings'
+import Profile from './Pages/Profile/Profile'
+import AboutMe from './Pages/AboutMePage/AboutMe'
 
 import ProtectedRoute from './Components/ProtectedRoute'
 
@@ -37,18 +37,18 @@ function App() {
         <Route path="profile" element={<Profile />} />
       </Route>
 
-      {/* Other Protected Pages */}
       <Route
-        path="/agency/:id"
+        path="/agency/"
         element={
           <ProtectedRoute>
             <AgencyPage />
           </ProtectedRoute>
         }
       />
+      {/* Other Protected Pages */}
 
       <Route
-        path="/vehicle-details/:vehicleId"
+        path="/vehicle-details/"
         element={
           <ProtectedRoute>
             <VehicleDetails />

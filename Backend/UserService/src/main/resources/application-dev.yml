@@ -6,6 +6,12 @@ spring:
     mongodb:
       uri: mongodb://root:root@mongodb:27017/CarRentalSystem?authSource=admin
 
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+
 server:
   port: 8081
 
@@ -13,9 +19,8 @@ eureka:
   instance:
     hostname: user-service
     prefer-ip-address: true
-  client:
-    serviceUrl:
-      defaultZone: http://eureka:8761/eureka/
+
+
 
 jwt:
   secretKey: ${JWT_SECRET_KEY}

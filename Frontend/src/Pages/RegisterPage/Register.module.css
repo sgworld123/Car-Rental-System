@@ -1,0 +1,358 @@
+.page {
+  min-height: 100vh;
+  background: #060606;
+  position: relative;
+  overflow: hidden;
+  font-family: "Poppins", sans-serif;
+  color: white;
+}
+
+/* grid background */
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 72px 72px;
+  opacity: 0.3;
+}
+
+/* glow effects */
+.page::before {
+  content: "";
+  position: absolute;
+  top: -220px;
+  right: -120px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 170, 0.1),
+    transparent 70%
+  );
+}
+
+.page::after {
+  content: "";
+  position: absolute;
+  bottom: -220px;
+  left: -150px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 170, 0.06),
+    transparent 70%
+  );
+}
+
+/* NAVBAR */
+
+.navbar {
+  height: 64px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 34px;
+  position: relative;
+  z-index: 2;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f1d8bd;
+}
+
+.brand svg {
+  font-size: 1rem;
+}
+
+.navText {
+  color: #b5b5b5;
+  font-size: 0.85rem;
+}
+
+.navText span {
+  color: #f1d8bd;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* MAIN CARD */
+
+.card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 760px;
+  margin: 42px auto;
+  background: rgba(18,18,18,0.92);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 22px;
+  padding: 34px;
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+/* HEADING */
+
+.heading h1 {
+  font-size: 2.2rem;
+  color: #f3dec8;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.heading p {
+  max-width: 620px;
+  color: #b9b9b9;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+/* FORM */
+
+.form {
+  width: 100%;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 0.85rem;
+  color: #efefef;
+  font-weight: 500;
+}
+
+.field input {
+  height: 50px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  padding: 0 14px;
+  background: rgba(255,255,255,0.06);
+  color: white;
+  font-size: 0.92rem;
+  transition: 0.25s ease;
+  font-family: inherit;
+}
+
+.field input::placeholder {
+  color: #707070;
+}
+
+.field input:focus {
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 0 0 3px rgba(241,216,189,0.08);
+}
+
+.passwordInput {
+  height: 50px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  padding-right: 14px;
+}
+
+.passwordInput input {
+  flex: 1;
+  background: transparent;
+}
+
+.passwordInput svg {
+  color: #8d8d8d;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* CHECKBOX */
+
+.checkboxRow {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.checkboxRow input {
+  width: 16px;
+  height: 16px;
+  accent-color: #f1d8bd;
+}
+
+.checkboxRow label {
+  color: #c7c7c7;
+  font-size: 0.88rem;
+}
+
+.checkboxRow span {
+  color: #f1d8bd;
+  cursor: pointer;
+}
+
+/* BUTTON */
+
+.submitBtn {
+  margin-top: 24px;
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 12px;
+  background: #f1d8bd;
+  color: #111;
+  font-size: 0.92rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  font-family: inherit;
+}
+
+.submitBtn:hover {
+  transform: translateY(-1px);
+  opacity: 0.96;
+}
+
+.submitBtn svg {
+  font-size: 0.85rem;
+}
+
+/* BOTTOM TEXT */
+
+.bottomText {
+  margin-top: 24px;
+  text-align: center;
+  color: #b9b9b9;
+  font-size: 0.9rem;
+}
+
+.bottomText span {
+  color: #f1d8bd;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* FOOTER */
+
+.footer {
+  position: absolute;
+  bottom: 18px;
+  left: 22px;
+  right: 22px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #7b7b7b;
+  font-size: 0.78rem;
+}
+
+.footerLinks {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.footerLinks span {
+  cursor: pointer;
+}
+
+/* FLOATING CARD */
+
+.floatingCard {
+  position: absolute;
+  right: 34px;
+  bottom: 34px;
+  width: 82px;
+  height: 112px;
+  border-radius: 16px;
+  border: 2px solid rgba(241,216,189,0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(10deg);
+  color: rgba(241,216,189,0.32);
+  font-size: 1.2rem;
+  backdrop-filter: blur(6px);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .card {
+    margin: 36px 20px;
+    padding: 28px;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heading h1 {
+    font-size: 1.9rem;
+  }
+
+  .heading p {
+    font-size: 0.9rem;
+  }
+
+  .footer {
+    position: relative;
+    margin-top: 30px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .floatingCard {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar {
+    padding: 0 18px;
+  }
+
+  .brand {
+    font-size: 1.3rem;
+  }
+
+  .navText {
+    display: none;
+  }
+
+  .card {
+    padding: 22px;
+  }
+
+  .heading h1 {
+    font-size: 1.7rem;
+  }
+
+  .submitBtn {
+    height: 50px;
+  }
+}

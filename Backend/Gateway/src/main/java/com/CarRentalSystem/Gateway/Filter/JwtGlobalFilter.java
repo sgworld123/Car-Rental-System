@@ -20,7 +20,7 @@ public class JwtGlobalFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
-        if(path.startsWith("/api/auth/"))
+        if(path.contains("/api/auth/"))
         {
             return chain.filter(exchange);
         }

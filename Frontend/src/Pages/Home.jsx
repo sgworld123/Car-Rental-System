@@ -192,7 +192,7 @@ const Home = () => {
           boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
           cursor: 'pointer'
         }}
-      >
+       >
         {searchResults.length === 0 ? (
           <p style={{
             textAlign: 'center',
@@ -318,9 +318,6 @@ const Home = () => {
 
         )}
       </div>
-
-
-
     </main>
   );
 };

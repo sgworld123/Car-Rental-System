@@ -24,7 +24,7 @@ spring:
           predicates:
             - Path=/api/user/**
         - id: AUTHSERVICE
-          uri: lb://USERSERVICE
+          uri: lb://AUTHSERVICE
           predicates:
             - Path=/api/auth/**
         - id: AGENCYSERVICE
@@ -56,4 +56,4 @@ jwt:
 
 logging:
   level:
-    org.springframework.cloud.gateway: INFO
+    org.springframework.cloud.gateway: DEBUG

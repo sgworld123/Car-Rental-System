@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/Backend/BookingService/pom.xml" />
         <option value="$PROJECT_DIR$/Backend/Gateway/pom.xml" />
         <option value="$PROJECT_DIR$/Backend/PaymentService/pom.xml" />
+        <option value="$PROJECT_DIR$/Backend/AuthService/pom.xml" />
       </list>
     </option>
     <option name="workspaceImportForciblyTurnedOn" value="true" />

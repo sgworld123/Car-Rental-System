@@ -14,7 +14,6 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// Auto-refresh when access token expires
 api.interceptors.response.use(
     (response) => response,
     async (error) => {

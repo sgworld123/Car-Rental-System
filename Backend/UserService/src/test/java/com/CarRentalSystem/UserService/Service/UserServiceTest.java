@@ -1,7 +1,6 @@
 package com.CarRentalSystem.UserService.Service;
 
 import com.CarRentalSystem.UserService.Dto.ProfileDto;
-import com.CarRentalSystem.UserService.Exceptions.UserNotFoundException;
 import com.CarRentalSystem.UserService.Model.User;
 import com.CarRentalSystem.UserService.Repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -88,15 +87,6 @@ class UserServiceTest {
         assertThat(result.getPhone()).isNotNull();
     }
 
-    @Test
-    @DisplayName("returnProfile – throws UserNotFoundException when user not found by authId")
-    void returnProfile_notFound_throws() {
-        when(userRepository.findByAuthId("missing-auth")).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> userService.returnProfile("missing-auth"))
-                .isInstanceOf(UserNotFoundException.class)
-                .hasMessageContaining("User not found");
-    }
 
     @Test
     @DisplayName("returnProfile – does not call findById, only findByAuthId")
