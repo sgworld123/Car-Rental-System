@@ -9,11 +9,11 @@ export function useLogin() {
         setLoading(true);
         setError(null)
         try {
-            console.log("SENDING LOGIN:", { username, password }); // 👈 ADD
+            console.log("SENDING LOGIN:", { username, password }); 
 
             const response = await loginFun({ username, password });
 
-            console.log("LOGIN RESPONSE:", response.data); // 👈 ADD
+            console.log("LOGIN RESPONSE:", response.data);
 
             localStorage.setItem("token", response.data.jwt);
             localStorage.setItem("refreshToken", response.data.refreshToken);

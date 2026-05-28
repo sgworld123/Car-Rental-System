@@ -24,16 +24,18 @@ api.interceptors.response.use(
 
             try {
                 const refreshToken = localStorage.getItem("refreshToken");
+
+                console.log("REFRESH TOKEN FROM STORAGE:", refreshToken); // is it null?
+
                 const { data } = await axios.post(
                     "http://localhost:8090/api/auth/refresh",
                     { refreshToken }
                 );
 
-                // Save new access token
-                localStorage.setItem("token", data.jwt);
+                console.log("REFRESH RESPONSE:", data); // does it have data.jwt?
 
-                // Retry original request with new token
-                original.headers.Authorization = `Bearer ${data.jwt}`;
+                localStorage.setItem("token", data.jwt);
+                delete original.headers.Authorization;
                 return api(original);
 
             } catch (err) {

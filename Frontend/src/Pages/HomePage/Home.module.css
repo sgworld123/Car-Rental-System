@@ -400,3 +400,18 @@
     font-size: 1.8rem;
   }
 }
+.searchResults {
+  padding: 44px 56px 70px;
+  position: relative;
+  z-index: 2;
+}
+.searchResults:hover {
+  border-color: rgba(241,216,189,0.1);
+}
+.sectionHeader {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}

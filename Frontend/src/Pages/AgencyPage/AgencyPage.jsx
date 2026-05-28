@@ -9,70 +9,28 @@ import {
   FaEnvelope,
   FaMapMarkedAlt,
   FaShieldAlt,
-  FaSlidersH,
-  FaCog,
-  FaBolt,
-  FaChair,
-  FaCar,
 } from "react-icons/fa";
+import { useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSearchAgencyById } from "../../Hooks/useSearchAgencyById";
+import { useSearchParams } from "react-router-dom";
 
 export default function AgencyPage() {
-  const vehicles = [
-    {
-      name: "BMW 7 Series",
-      image:
-        "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1200&auto=format&fit=crop",
-      tag: "Luxury",
-      features: ["Automatic", "Hybrid"],
-      price: "$1.25",
-      icon1: <FaCog />,
-      icon2: <FaBolt />,
-    },
-    {
-      name: "Tesla Model S",
-      image:
-        "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=1200&auto=format&fit=crop",
-      tag: "Electric",
-      features: ["Electric", "5 Seats"],
-      price: "$1.40",
-      icon1: <FaBolt />,
-      icon2: <FaChair />,
-    },
-    {
-      name: "Audi Q8",
-      image:
-        "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?q=80&w=1200&auto=format&fit=crop",
-      tag: "SUV",
-      features: ["AWD", "Extra Space"],
-      price: "$1.15",
-      icon1: <FaCar />,
-      icon2: <FaChair />,
-    },
-  ];
+  const navigate = useNavigate();
+  const { agency, loading, error, searchedAgency } = useSearchAgencyById();
+  const [searchParams] = useSearchParams();
+  const fromDate = searchParams.get("from");
+  const toDate = searchParams.get("to");
+  const { id } = useParams();
 
-  const reviews = [
-    {
-      name: "James Harrington",
-      date: "SEPTEMBER 12, 2023",
-      text:
-        "Impeccable service. The car was spotless and ready for me as soon as I arrived.",
-      avatar: "https://i.pravatar.cc/100?img=11",
-    },
-    {
-      name: "Sophia Chen",
-      date: "AUGUST 28, 2023",
-      text:
-        "Booked a Tesla for the weekend. Staff was very helpful and the process was seamless.",
-      avatar: "https://i.pravatar.cc/100?img=32",
-    },
-    {
-      name: "Marcello Rossi",
-      date: "AUGUST 15, 2023",
-      text:
-        "Elite Grand always delivers. Their luxury vehicles are maintained perfectly.",
-      avatar: "https://i.pravatar.cc/100?img=14",
-    },
-  ];
+  useEffect(() => {
+    console.log("AgencyPage mounted with ID:", id);
+    const fetchAgencyDetails = async () => {
+      await searchedAgency(id);
+    };
+    fetchAgencyDetails();
+  }, [id]);
+
 
   return (
     <div className={styles.page}>
@@ -90,26 +48,23 @@ export default function AgencyPage() {
       </header>
 
       <section className={styles.hero}>
-        <img
-          src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1400&auto=format&fit=crop"
-          alt="agency"
-        />
+        <img src={agency?.agencyImage} alt={agency?.name} />
 
         <div className={styles.overlay}></div>
 
         <div className={styles.heroContent}>
           <div>
-            <h1>Elite Grand Car Rentals</h1>
+            <h1>{agency?.name}</h1>
 
             <p>
               <FaMapMarkerAlt />
-              Mayfair District, London
+              {agency?.address}
             </p>
           </div>
 
           <div className={styles.rating}>
             <FaStar />
-            4.9 (1.2k Reviews)
+            {agency?.rating} (1.2k Reviews)
           </div>
         </div>
       </section>
@@ -119,9 +74,8 @@ export default function AgencyPage() {
           <h3>About the Agency</h3>
 
           <p>
-            Providing premium automotive experiences since 2012.
-            Elite Grand specializes in luxury sedans, executive SUVs,
-            and high-performance sports cars for discerning travelers.
+            {agency?.details ||
+              "No details available for this agency. Please check back later."}
           </p>
 
           <div className={styles.contactGrid}>
@@ -132,7 +86,7 @@ export default function AgencyPage() {
 
               <div>
                 <label>PHONE</label>
-                <p>+44 20 7946 0123</p>
+                <p>{agency?.phone || "+44 20 7946 0123"}</p>
               </div>
             </div>
 
@@ -143,7 +97,7 @@ export default function AgencyPage() {
 
               <div>
                 <label>EMAIL</label>
-                <p>concierge@elitegrand.com</p>
+                <p>{agency?.email || "concierge@elitegrand.com"}</p>
               </div>
             </div>
 
@@ -155,8 +109,8 @@ export default function AgencyPage() {
               <div>
                 <label>ADDRESS</label>
                 <p>
-                  12B Berkeley Square, Mayfair, London W1J 6EB,
-                  United Kingdom
+                  {agency?.address ||
+                    "12B Berkeley Square, Mayfair, London W1J 6EB, United Kingdom"}
                 </p>
               </div>
             </div>
@@ -204,43 +158,41 @@ export default function AgencyPage() {
       <section className={styles.vehiclesSection}>
         <div className={styles.sectionHeader}>
           <h2>Available Vehicles</h2>
-
-          <button className={styles.filterBtn}>
-            <FaSlidersH />
-          </button>
         </div>
 
         <div className={styles.vehicleGrid}>
-          {vehicles.map((vehicle, index) => (
+          {agency?.vehicleInfo?.map((vehicle, index) => (
             <div className={styles.vehicleCard} key={index}>
-              <img src={vehicle.image} alt={vehicle.name} />
+              <img src={vehicle.images[0]} alt={vehicle.carModel} />
 
               <div className={styles.vehicleContent}>
                 <div className={styles.vehicleTop}>
                   <h3>{vehicle.name}</h3>
 
-                  <span>{vehicle.tag}</span>
+                  <span>{vehicle.carModel}</span>
                 </div>
 
                 <div className={styles.features}>
-                  <p>
-                    {vehicle.icon1}
-                    {vehicle.features[0]}
-                  </p>
+                  <p>{vehicle.features[0]}</p>
 
-                  <p>
-                    {vehicle.icon2}
-                    {vehicle.features[1]}
-                  </p>
+                  <p>{vehicle.features[1]}</p>
                 </div>
 
                 <div className={styles.vehicleBottom}>
                   <div>
                     <label>Price per km</label>
-                    <h4>{vehicle.price}</h4>
+                    <h4>${vehicle.pricePerKm}</h4>
                   </div>
 
-                  <button>Book Now</button>
+                  <button
+                    onClick={() => {
+                      console.log("id:", id, "vehicleId:", vehicle.vehicleId, "from:", fromDate, "to:", toDate)
+                      navigate(`/dashboard/agency/${id}/vehicle-details/${vehicle.vehicleId}?from=${fromDate}&to=${toDate}`)
+                    }
+                    }
+                  >
+                    Book Now
+                  </button>
                 </div>
               </div>
             </div>
@@ -252,7 +204,7 @@ export default function AgencyPage() {
         <h2>Customer Reviews</h2>
 
         <div className={styles.reviewGrid}>
-          {reviews.map((review, index) => (
+          {agency?.reviews?.map((review, index) => (
             <div className={styles.reviewCard} key={index}>
               <div className={styles.reviewHeader}>
                 <img src={review.avatar} alt={review.name} />
@@ -269,17 +221,14 @@ export default function AgencyPage() {
                 </div>
               </div>
 
-              <p className={styles.reviewText}>
-                "{review.text}"
-              </p>
+              <p className={styles.reviewText}>"{review.text}"</p>
 
-              <span className={styles.reviewDate}>
-                {review.date}
-              </span>
+              <span className={styles.reviewDate}>{review.date}</span>
             </div>
           ))}
         </div>
       </section>
+
     </div>
   );
 }

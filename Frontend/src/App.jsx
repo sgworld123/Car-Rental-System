@@ -17,53 +17,19 @@ import ProtectedRoute from './Components/ProtectedRoute'
 function App() {
   return (
     <Routes>
-
       {/* Public Routes */}
       <Route path='/' element={<Login />} />
       <Route path='/register' element={<Register />} />
-
       {/* Protected Dashboard Routes */}
-      <Route
-        path='/dashboard'
-        element={
-          <ProtectedRoute>
-            <DashBoardLayout />
-          </ProtectedRoute>
-        }
-      >
+      <Route path='/dashboard' element={<ProtectedRoute><DashBoardLayout /></ProtectedRoute>}>
         <Route index element={<Home />} />
         <Route path="bookings" element={<MyBookings />} />
         <Route path="settings" element={<AboutMe />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="agency/:id" element={<AgencyPage />} />                              
+        <Route path="agency/:id/vehicle-details/:vehicleId" element={<VehicleDetails />} /> 
+        <Route path="confirm-booking" element={<ConfirmBooking />} />                    
       </Route>
-
-      <Route
-        path="/agency/"
-        element={
-          <ProtectedRoute>
-            <AgencyPage />
-          </ProtectedRoute>
-        }
-      />
-      {/* Other Protected Pages */}
-
-      <Route
-        path="/vehicle-details/"
-        element={
-          <ProtectedRoute>
-            <VehicleDetails />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/confirm-booking"
-        element={
-          <ProtectedRoute>
-            <ConfirmBooking />
-          </ProtectedRoute>
-        }
-      />
 
     </Routes>
   )

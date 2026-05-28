@@ -40,7 +40,7 @@ const VehicleDetails = () => {
             setBookingLoading(true);
             const payload = { vehicleId, cost, fromDate, toDate };
             const result = await handleCreateBooking(payload);
-            setPendingBookingId(result.bookingId); // ✅ save bookingId from response
+            setPendingBookingId(result.bookingId); 
             setShowModal(true);
         } catch (error) {
             console.error("Booking creation failed:", error);
@@ -50,11 +50,10 @@ const VehicleDetails = () => {
         }
     };
 
-    // Confirm → calls confirmBooking with saved bookingId
     const confirmBooking = async () => {
         try {
             setBookingLoading(true);
-            await handleConfirmBooking(pendingBookingId); // ✅ uses bookingId from createBooking
+            await handleConfirmBooking(pendingBookingId); 
             setShowModal(false);
             navigate("/dashboard/bookings");
         } catch (error) {

@@ -13,6 +13,8 @@ import {
   FaEnvelope,
   FaStar,
 } from "react-icons/fa";
+import { useSearchParams } from "react-router-dom";
+
 
 export default function Home() {
   const { searchResults, searchAgency } = useSearchAgencies();
@@ -91,11 +93,11 @@ export default function Home() {
               Source City
             </label>
 
-            <input type="text" 
-            placeholder="Where from?" 
-            name="sourceCity" 
-            value={tripData.sourceCity} 
-            onChange={handleChange} />
+            <input type="text"
+              placeholder="Where from?"
+              name="sourceCity"
+              value={tripData.sourceCity}
+              onChange={handleChange} />
           </div>
 
           <div className={styles.inputGroup}>
@@ -148,19 +150,8 @@ export default function Home() {
         </div>
       </section>
 
-      <div
-        style={{
-          marginTop: '20px',
-          width: '100%',
-          maxWidth: '900px',
-          display: hit ? 'block' : 'none',
-          background: '#1a1a1a',
-          borderRadius: '16px',
-          padding: '24px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-          cursor: 'pointer'
-        }}
-       >
+      <div className={styles.searchResults}>
+        <p className={styles.sectionHeader}>Searched Results :</p>
         {searchResults.length === 0 ? (
           <p style={{
             textAlign: 'center',
@@ -171,120 +162,52 @@ export default function Home() {
           }}>
             No search results found.
           </p>
-        ) : (
-          searchResults.map((agency, index) => (
-            <div
-              key={index}
-              className="agency-card"
-              style={{
-                background: "#1f1f1f",
-                border: "1px solid #2f2f2f",
-                borderRadius: "16px",
-                padding: "20px",
-                marginBottom: "18px",
-                transition: "all 0.3s ease",
-                cursor: "pointer",
-                display: "flex",
-                gap: "20px",
-                alignItems: "center"
-              }}
-              onClick={() => {
-                const { fromDate, toDate } = tripData;
-                navigate(`/agency/${agency.id}?from=${fromDate}&to=${toDate}`);
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-4px)";
-                e.currentTarget.style.boxShadow =
-                  "0 15px 30px rgba(0,0,0,0.6)";
-                e.currentTarget.style.borderColor = "#3f3f3f";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "none";
-                e.currentTarget.style.borderColor = "#2f2f2f";
-              }}
-            >
-              {/* Agency Image */}
-              <img
-                src={agency.agencyImage}
-                alt={agency.name}
-                style={{
-                  width: "90px",
-                  height: "90px",
-                  borderRadius: "14px",
-                  objectFit: "cover",
-                  flexShrink: 0
-                }}
-              />
+        ) : <div className={`${styles.agencyList} ${styles.centreCard}`}>
+          {searchResults.map((agency) => (
+            <div className={styles.card} key={agency.id} onClick={() => {
+              const { fromDate, toDate } = tripData;
+              navigate(`/dashboard/agency/${agency.id}?from=${fromDate}&to=${toDate}`)
+            }}>
+              <div className={styles.cardLeft}>
+                <img src={agency.agencyImage} alt={agency.name} />
+                <div className={styles.cardInfo}>
+                  <div className={styles.titleRow}>
+                    <h3>{agency.name}</h3>
 
-              {/* Content Section */}
-              <div style={{ flex: 1 }}>
-                <h3
-                  style={{
-                    margin: "0 0 6px 0",
-                    color: "#ffffff",
-                    fontSize: "22px",
-                    fontWeight: "600"
-                  }}
-                >
-                  {agency.name}
-                </h3>
+                    <div className={styles.rating}>
+                      <FaStar />
+                      <span>
+                        {agency.rating} ({agency.reviews})
+                      </span>
+                    </div>
+                  </div>
 
-                <p
-                  style={{
-                    margin: "0 0 10px 0",
-                    color: "#9a9a9a",
-                    fontSize: "14px"
-                  }}
-                >
-                  {agency.address}
-                </p>
+                  <p className={styles.address}>
+                    <FaMapMarkerAlt />
+                    {agency.address}
+                  </p>
 
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "20px",
-                    alignItems: "center",
-                    fontSize: "14px",
-                    color: "#b0b0b0"
-                  }}
-                >
-                  <span>📞 {agency.phone}</span>
-                  <span>⭐ {agency.rating}</span>
+                  <div className={styles.contact}>
+                    <span>
+                      <FaPhoneAlt />
+                      {agency.phone}
+                    </span>
+
+                    <span>
+                      <FaEnvelope />
+                      {agency.email}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* CTA Section */}
-              <div style={{ textAlign: "right" }}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`mailto:${agency.email}`);
-                  }}
-                  style={{
-                    padding: "10px 18px",
-                    background: "linear-gradient(135deg, #6d28d9, #9333ea)",
-                    border: "none",
-                    borderRadius: "10px",
-                    color: "white",
-                    fontWeight: "500",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = "translateY(-2px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = "translateY(0)";
-                  }}
-                >
-                  Contact
-                </button>
-              </div>
+              <button className={styles.viewBtn}>
+                View Agency
+                <FaArrowRight />
+              </button>
             </div>
-          ))
-
-        )}
+          ))}
+        </div>}
       </div>
 
       <section className={styles.agencies}>

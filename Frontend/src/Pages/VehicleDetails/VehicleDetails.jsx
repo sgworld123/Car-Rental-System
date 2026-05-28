@@ -1,5 +1,5 @@
 import styles from "./VehicleDetails.module.css";
-
+import { useState, useEffect } from "react";
 import {
   FaStar,
   FaBolt,
@@ -13,223 +13,316 @@ import {
   FaCog,
   FaHeart,
   FaShareAlt,
+  FaArrowLeft,
+  FaMapMarkerAlt,
+  FaShieldAlt,
 } from "react-icons/fa";
 
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useVehicleById } from "../../Hooks/useVehicleById";
+import { useSearchParams } from "react-router-dom";
+import { useCreateBooking } from "../../Hooks/useCreateBooking";
+import BookingModal from "../BookingModal/BookingModal";
+
 export default function VehicleDetails() {
+  const navigate = useNavigate();
+  const { vehicleId } = useParams();
+  const location = useLocation();
+
+  const { vehicle, loading, error, fetchVehicle } = useVehicleById(vehicleId);
+
+  useEffect(() => {
+    fetchVehicle();
+  }, [vehicleId]);
+
+  const agency = location.state?.agency || {};
+
+  const [activeImg, setActiveImg] = useState(0);
+  const [wished, setWished] = useState(false);
+  const [searchParams] = useSearchParams();
+  const fromDate = searchParams.get("from");
+  const toDate = searchParams.get("to");
+  const [bookingLoading, setBookingLoading] = useState(false);
+
+  const { handleCreateBooking } = useCreateBooking();
+
+
+  const calcDays = () => {
+    if (!fromDate || !toDate) return 1;
+    const diff = new Date(toDate) - new Date(fromDate);
+    return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  };
+  const days = calcDays();
+
+  const [driverOption, setDriverOption] = useState("self"); // "self" | "driver"
+  const DRIVER_FEE_PER_DAY = 500;
+  const SERVICE_FEE = 250;
+  const KM = 100;
+
+  const kmCost = vehicle?.pricePerKm * KM * days;
+  const driverCost = driverOption === "driver" ? DRIVER_FEE_PER_DAY * days : 0;
+  const total = kmCost + driverCost + SERVICE_FEE;
+  const [showModal, setShowModal] = useState(false);
+
+  const handleBook = async () => {
+    if (!fromDate || !toDate) {
+      alert("Search dates missing");
+      return;
+    }
+    try {
+      setBookingLoading(true);
+      const payload = { vehicleId, total, fromDate, toDate };
+      const result = await handleCreateBooking(payload);
+      setPendingBookingId(result.bookingId);
+      setShowModal(true);
+    } catch (error) {
+      console.error("Booking creation failed:", error);
+      alert("Failed to initiate booking. Please try again.");
+    } finally {
+      setBookingLoading(false);
+    }
+  };
+
+  /* ── Loading / Error / Empty ── */
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.stateScreen}>
+          <div className={styles.spinner} />
+          <p>Loading vehicle details…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.stateScreen}>
+          <p className={styles.errorText}>Failed to load vehicle.</p>
+          <button className={styles.retryBtn} onClick={() => navigate(-1)}>
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!vehicle) return null;
+
+  const specs = [
+    { icon: <FaBolt />, label: "Fuel Type", value: vehicle.features?.[1] || "—" },
+    { icon: <FaTachometerAlt />, label: "Car Type", value: vehicle.carModel || "—" },
+    { icon: <FaSlidersH />, label: "Transmission", value: vehicle.features?.[0] || "—" },
+    { icon: <FaChair />, label: "Driver", value: vehicle.driverName || "—" },
+  ];
+
   return (
     <div className={styles.page}>
-      <div className={styles.grid}></div>
+      {/* Warm ambient background */}
+      <div className={styles.grid} />
+      {/* ── MAIN ── */}
+      <main className={styles.main}>
 
-      <section className={styles.hero}>
-        <img
-          src="https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=1400&auto=format&fit=crop"
-          alt="car"
-        />
-
-        <div className={styles.dots}>
-          <span className={styles.activeDot}></span>
-          <span></span>
-          <span></span>
-        </div>
-      </section>
-
-      <section className={styles.content}>
+        {/* ═══ LEFT COLUMN ═══ */}
         <div className={styles.left}>
-          <div className={styles.topInfo}>
-            <div className={styles.badgeRow}>
-              <span className={styles.badge}>
-                Premium Sedan
+
+          {/* Image Carousel */}
+          <div className={styles.carousel}>
+            <div className={styles.mainImgWrap}>
+              <img
+                src={vehicle.images?.[activeImg] || vehicle.coverImage}
+                alt={vehicle.name}
+                className={styles.mainImg}
+              />
+              <span className={styles.imgCounter}>
+                {activeImg + 1} / {vehicle.images?.length || 1}
               </span>
+            </div>
 
-              <div className={styles.rating}>
+            <div className={styles.thumbRow}>
+              {vehicle.images?.map((img, i) => (
+                <button
+                  key={i}
+                  className={`${styles.thumb} ${i === activeImg ? styles.thumbActive : ""}`}
+                  onClick={() => setActiveImg(i)}
+                >
+                  <img src={img} alt={`vehicle-${i}`} />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Title Block */}
+          <div className={styles.titleBlock}>
+            <div className={styles.titleRow}>
+              <div>
+                <div className={styles.badgeRow}>
+                  <span className={styles.badge}>{vehicle.carModel}</span>
+                  <span className={styles.carNumber}>
+                    <FaShieldAlt />
+                    {vehicle.carNumber}
+                  </span>
+                </div>
+                <h1 className={styles.carName}>{vehicle.name}</h1>
+              </div>
+
+              <div className={styles.ratingPill}>
                 <FaStar />
-                4.9 (124 reviews)
+                <span>4.9</span>
+                <em>({vehicle.reviews?.length || 0} reviews)</em>
               </div>
             </div>
 
-            <h1>Porsche Taycan 4S</h1>
+            <p className={styles.description}>{vehicle.description}</p>
 
-            <p className={styles.description}>
-              Experience the perfect blend of electric
-              performance and high-end hospitality. The
-              Taycan 4S offers a serene driving experience
-              with cutting-edge technology, ensuring your
-              journey is as smooth as it is sophisticated.
-            </p>
+            {agency?.name && (
+              <div className={styles.agencyTag}>
+                <FaMapMarkerAlt />
+                <span>{agency.name} · {agency.address}</span>
+              </div>
+            )}
           </div>
 
+          {/* Specs */}
           <div className={styles.specGrid}>
-            <div className={styles.specCard}>
-              <FaBolt />
-
-              <div>
-                <label>Engine</label>
-                <h4>Electric</h4>
+            {specs.map((s, i) => (
+              <div key={i} className={styles.specCard}>
+                <div className={styles.specIcon}>{s.icon}</div>
+                <div>
+                  <label>{s.label}</label>
+                  <h4>{s.value}</h4>
+                </div>
               </div>
-            </div>
-
-            <div className={styles.specCard}>
-              <FaTachometerAlt />
-
-              <div>
-                <label>Top Speed</label>
-                <h4>250 km/h</h4>
-              </div>
-            </div>
-
-            <div className={styles.specCard}>
-              <FaSlidersH />
-
-              <div>
-                <label>Gearbox</label>
-                <h4>Automatic</h4>
-              </div>
-            </div>
-
-            <div className={styles.specCard}>
-              <FaChair />
-
-              <div>
-                <label>Seats</label>
-                <h4>4 Seats</h4>
-              </div>
-            </div>
+            ))}
           </div>
 
+          {/* Features */}
           <div className={styles.featuresSection}>
-            <h2>Features & Amenities</h2>
-
+            <h2 className={styles.sectionTitle}>Features & Amenities</h2>
             <div className={styles.featuresGrid}>
-              <p>
-                <FaCheckCircle />
-                Adaptive Cruise Control
-              </p>
-
-              <p>
-                <FaCheckCircle />
-                Panoramic Sunroof
-              </p>
-
-              <p>
-                <FaCheckCircle />
-                Bose Surround Sound
-              </p>
-
-              <p>
-                <FaCheckCircle />
-                Heated & Ventilated Seats
-              </p>
+              {vehicle.features?.map((feat, i) => (
+                <p key={i}>
+                  <FaCheckCircle />
+                  {feat}
+                </p>
+              ))}
+              <p><FaCheckCircle />GPS Navigation</p>
+              <p><FaCheckCircle />Climate Control</p>
             </div>
           </div>
 
+          {/* Reviews */}
           <div className={styles.reviewSection}>
-            <h2>Guest Reviews</h2>
-
-            <div className={styles.reviewCard}>
-              <div className={styles.reviewHeader}>
-                <div className={styles.user}>
-                  <img
-                    src="https://i.pravatar.cc/100?img=12"
-                    alt="user"
-                  />
-
-                  <div>
-                    <h4>Alex Thompson</h4>
-                    <span>October 2023</span>
+            <h2 className={styles.sectionTitle}>Guest Reviews</h2>
+            <div className={styles.reviewList}>
+              {vehicle.reviews?.map((rev, i) => (
+                <div key={i} className={styles.reviewCard}>
+                  <div className={styles.reviewHeader}>
+                    <div className={styles.reviewUser}>
+                      <img src={rev.avatar} alt={rev.name} />
+                      <div>
+                        <h4>{rev.name}</h4>
+                        <span>{rev.date}</span>
+                      </div>
+                    </div>
+                    <div className={styles.reviewStars}>
+                      {[...Array(5)].map((_, s) => <FaStar key={s} />)}
+                    </div>
                   </div>
+                  <p className={styles.reviewText}>{rev.text}</p>
                 </div>
-
-                <div className={styles.reviewStars}>
-                  <FaStar />
-                  <FaStar />
-                  <FaStar />
-                  <FaStar />
-                  <FaStar />
-                </div>
-              </div>
-
-              <p>
-                "Incredible service from DriveEasy. The car
-                was pristine, and the pickup process was the
-                fastest I've ever experienced."
-              </p>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className={styles.bookingCard}>
+        {/* ═══ RIGHT COLUMN — BOOKING CARD ═══ */}
+        <aside className={styles.bookingCard}>
           <div className={styles.priceRow}>
-            <div>
-              <h2>$180</h2>
-              <span>/ day</span>
+            <div className={styles.priceBlock}>
+              <h2>₹{vehicle.pricePerKm}</h2>
+              <span>/ km</span>
             </div>
-
-            <p>
+            <p className={styles.taxNote}>
               <FaCog />
               Inclusive of tax
             </p>
           </div>
 
+          <div className={styles.divider} />
+
           <div className={styles.field}>
             <label>Trip Dates</label>
-
-            <div className={styles.input}>
+            <div className={styles.inputRow}>
               <FaCalendarAlt />
-              <span>Oct 24 — Oct 27</span>
+              <span>{fromDate} to {toDate}</span>
             </div>
           </div>
 
           <div className={styles.field}>
-            <label>Driver Option</label>
-
-            <div className={styles.input}>
-              <div className={styles.driver}>
-                <FaUser />
-                <span>Self Drive</span>
-              </div>
-
-              <FaChevronDown />
+            <label>Driver option</label>
+            <div className={styles.inputRow}>
+              <FaUser />
+              <select
+                value={driverOption}
+                onChange={(e) => setDriverOption(e.target.value)}
+                className={styles.driverSelect}
+              >
+                <option value="self">Self drive</option>
+                <option value="driver">
+                  {vehicle.driverName
+                    ? `With driver (${vehicle.driverName}) +₹${DRIVER_FEE_PER_DAY}/day`
+                    : `With driver +₹${DRIVER_FEE_PER_DAY}/day`}
+                </option>
+              </select>
             </div>
           </div>
+
+          <div className={styles.divider} />
 
           <div className={styles.bill}>
-            <div>
-              <span>$180 x 3 days</span>
-              <span>$540</span>
+            <div className={styles.billRow}>
+              <span>Est. 100 km × {days} {days === 1 ? "day" : "days"}</span>
+              <span>₹{kmCost.toLocaleString('en-IN')}</span>
             </div>
-
-            <div>
+            {driverOption === "driver" && (
+              <div className={styles.billRow}>
+                <span>Driver fee ({days} days)</span>
+                <span>₹{driverCost.toLocaleString('en-IN')}</span>
+              </div>
+            )}
+            <div className={styles.billRow}>
               <span>Service fee</span>
-              <span>$25</span>
+              <span>₹250</span>
             </div>
           </div>
 
-          <div className={styles.total}>
+          <div className={styles.totalRow}>
             <span>Total</span>
-            <h2>$565</h2>
+            <h2>₹{total.toLocaleString('en-IN')}</h2>
           </div>
 
-          <button className={styles.bookBtn}>
-            Book Now
-          </button>
+          <button className={styles.bookBtn} onClick={() => {
+            handleBook();
+            setShowModal(true);
+          }
+          }>Confirm Booking</button>
 
-          <p className={styles.note}>
-            You won't be charged yet
-          </p>
+          {showModal && (
+            <BookingModal
+              vehicle={vehicle}
+              fromDate={fromDate}
+              toDate={toDate}
+              days={days}
+              driverOption={driverOption}
+              onClose={() => setShowModal(false)}
+            />
+          )}
 
-          <div className={styles.actions}>
-            <button>
-              <FaHeart />
-              Save to Wishlist
-            </button>
-
-            <button>
-              <FaShareAlt />
-              Share Vehicle
-            </button>
-          </div>
-        </div>
-      </section>
+          <p className={styles.note}>You won't be charged yet</p>
+        </aside>
+      </main>
     </div>
   );
 }

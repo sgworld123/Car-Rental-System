@@ -76,7 +76,7 @@ export default function Login() {
             <h2>Welcome Back</h2>
 
             <p>
-              Continue your journey with LUXE.
+              Continue your journey with RENTENGINE.
             </p>
 
             <form className={styles.form}>
