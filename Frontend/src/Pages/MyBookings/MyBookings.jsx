@@ -1,90 +1,150 @@
 import styles from "./MyBookings.module.css";
-
-import {
-  FaCheckCircle,
-  FaClock,
-  FaTimesCircle,
-  FaSpinner,
-} from "react-icons/fa";
+import { FaCheckCircle, FaClock, FaTimesCircle, FaSpinner } from "react-icons/fa";
+import { useEffect, useState, useRef } from "react";
+import { getUserBookings } from "../../services/bookingService";
+import { useCancelBooking } from "../../Hooks/useCancelBooking";
 
 export default function Bookings() {
-  const bookings = [
-    {
-      id: "#DE-9942",
-      name: "Luxury Sedan S-Class",
-      date: "Oct 24 - Oct 28, 2023",
-      price: "$540.00",
-      status: "confirmed",
-      image:
-        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200&auto=format&fit=crop",
-    },
-    {
-      id: "#DE-8821",
-      name: "Electric Compact SUV",
-      date: "Nov 02 - Nov 05, 2023",
-      price: "$320.00",
-      status: "pending",
-      image:
-        "https://images.unsplash.com/photo-1553440569-bcc63803a83d?q=80&w=1200&auto=format&fit=crop",
-    },
-    {
-      id: "#DE-1104",
-      name: "Convertible GT",
-      date: "Sep 12 - Sep 15, 2023",
-      price: "$450.00",
-      status: "cancelled",
-      image:
-        "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1200&auto=format&fit=crop",
-    },
-    {
-      id: "#DE-4451",
-      name: "Off-Road Explorer",
-      date: "Oct 30 - Nov 04, 2023",
-      price: "$780.00",
-      status: "cancelling",
-      image:
-        "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=1200&auto=format&fit=crop",
-    },
-  ];
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [cancellingIds, setCancellingIds] = useState(new Set());
+  const pollRefs = useRef({});
 
-  const renderStatus = (status) => {
-    switch (status) {
-      case "confirmed":
-        return (
-          <span className={`${styles.status} ${styles.confirmed}`}>
-            <FaCheckCircle />
-            CONFIRMED
-          </span>
-        );
+  const { cancel, cancelError } = useCancelBooking();
 
-      case "pending":
-        return (
-          <span className={`${styles.status} ${styles.pending}`}>
-            <FaClock />
-            PENDING
-          </span>
-        );
-
-      case "cancelled":
-        return (
-          <span className={`${styles.status} ${styles.cancelled}`}>
-            <FaTimesCircle />
-            CANCELLED
-          </span>
-        );
-
-      case "cancelling":
-        return (
-          <span className={`${styles.status} ${styles.cancelling}`}>
-            <FaSpinner />
-            CANCELLING
-          </span>
-        );
-
-      default:
-        return null;
+  const fetchBookings = async () => {
+    try {
+      const response = await getUserBookings();
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data
+        ? [response.data]
+        : [];
+      setBookings(data);
+      return data;
+    } catch (err) {
+      console.error("Error fetching bookings:", err);
+      setError("Failed to load bookings.");
+      return [];
     }
   };
+
+  useEffect(() => {
+    fetchBookings().finally(() => setLoading(false));
+    return () => {
+      Object.values(pollRefs.current).forEach(({ interval, timeout }) => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      });
+    };
+  }, []);
+
+  const handleCancel = async (id) => {
+    try {
+      await cancel(id);
+
+      setCancellingIds((prev) => new Set(prev).add(id));
+      setBookings((prev) =>
+        prev.map((b) => (b.bookingId === id ? { ...b, status: "CANCELLING" } : b))
+      );
+
+      const interval = setInterval(async () => {
+        const data = await fetchBookings();
+        const updated = data.find((b) => b.bookingId === id);
+        if (updated?.status === "CANCELLED") {
+          clearInterval(interval);
+          clearTimeout(pollRefs.current[id]?.timeout);
+          delete pollRefs.current[id];
+          setCancellingIds((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+        }
+      }, 2000);
+
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+        delete pollRefs.current[id];
+        setCancellingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }, 30000);
+
+      pollRefs.current[id] = { interval, timeout };
+    } catch (e) {
+      console.error("Cancel failed", e);
+      setCancellingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  };
+
+  const formatDateRange = (from, to) => {
+    const options = { month: "short", day: "numeric", year: "numeric" };
+    const f = new Date(from).toLocaleDateString("en-US", options);
+    const t = new Date(to).toLocaleDateString("en-US", options);
+    return `${f} - ${t}`;
+  };
+
+  const formatCost = (cost) => `₹${Number(cost).toLocaleString("en-IN")}`;
+  const shortId = (id) => `#${id?.slice(-8).toUpperCase()}`;
+
+  const renderStatus = (status) => {
+  switch (status?.toUpperCase()) {
+    case "CONFIRMED":
+      return (
+        <span className={`${styles.status} ${styles.confirmed}`}>
+          <FaCheckCircle />
+          CONFIRMED
+        </span>
+      );
+
+    case "PENDING":
+      return (
+        <span className={`${styles.status} ${styles.pending}`}>
+          <FaClock />
+          PENDING
+        </span>
+      );
+
+    case "CANCELLED":
+      return (
+        <span className={`${styles.status} ${styles.cancelled}`}>
+          <FaTimesCircle />
+          CANCELLED
+        </span>
+      );
+
+    case "REFUNDED":
+      return (
+        <span className={`${styles.status} ${styles.cancelled}`}>
+          <FaTimesCircle />
+          REFUNDED
+        </span>
+      );
+
+    case "CANCELLING":
+      return (
+        <span className={`${styles.status} ${styles.cancelling}`}>
+          <FaSpinner className={styles.spin} />
+          CANCELLING
+        </span>
+      );
+
+    default:
+      return (
+        <span className={`${styles.status} ${styles.pending}`}>
+          {status}
+        </span>
+      );
+  }
+};
 
   return (
     <div className={styles.page}>
@@ -93,56 +153,68 @@ export default function Bookings() {
       <div className={styles.container}>
         <div className={styles.heading}>
           <h1>My Bookings</h1>
-
-          <p>
-            Manage your current and upcoming vehicle rentals.
-          </p>
+          <p>Manage your current and upcoming vehicle rentals.</p>
         </div>
 
+        {loading && <p className={styles.infoText}>Loading bookings...</p>}
+        {error && <p className={styles.errorText}>{error}</p>}
+        {cancelError && <p className={styles.errorText}>Cancel failed. Please try again.</p>}
+        {!loading && bookings.length === 0 && (
+          <p className={styles.infoText}>No bookings yet.</p>
+        )}
+
         <div className={styles.list}>
-          {bookings.map((booking, index) => (
-            <div className={styles.card} key={index}>
-              <div className={styles.left}>
-                <img
-                  src={booking.image}
-                  alt={booking.name}
-                />
+          {bookings.map((booking) => {
+            const isCancelling = cancellingIds.has(booking.bookingId);
 
-                <div className={styles.info}>
+            return (
+              <div className={styles.card} key={booking.bookingId}>
+                <div className={styles.left}>
+                  <img src={booking.imageUrl} alt={booking.name} />
 
-                  <p>{booking.name}</p>
+                  <div className={styles.info}>
+                    <p>{booking.name}</p>
 
-                  <div className={styles.meta}>
-                    <div>
-                      <label>DATE RANGE</label>
-                      <p>{booking.date}</p>
-                    </div>
-
-                    <div>
-                      <label>TOTAL COST</label>
-                      <p>{booking.price}</p>
+                    <div className={styles.meta}>
+                      <div>
+                        <label>BOOKING ID</label>
+                        <p>{shortId(booking.bookingId)}</p>
+                      </div>
+                      <div>
+                        <label>DATE RANGE</label>
+                        <p>{formatDateRange(booking.fromDate, booking.endDate)}</p>
+                      </div>
+                      <div>
+                        <label>TOTAL COST</label>
+                        <p>{formatCost(booking.cost)}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                <div className={styles.right}>
+                  {renderStatus(isCancelling ? "CANCELLING" : booking.status)}
+
+                  {(booking.status?.toUpperCase() === "CONFIRMED" ||
+                    booking.status?.toUpperCase() === "PENDING" ||
+                    isCancelling) && (
+                    <div className={styles.actions}>
+                      {booking.status?.toUpperCase() === "CONFIRMED" && (
+                        <button className={styles.receiptBtn}>View Receipt</button>
+                      )}
+                      <button
+                        className={styles.cancelBtn}
+                        onClick={() => handleCancel(booking.bookingId)}
+                        disabled={isCancelling}
+                      >
+                        {isCancelling ? "Cancelling..." : "Cancel Booking"}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-
-              <div className={styles.right}>
-                {renderStatus(booking.status)}
-
-                {booking.status === "confirmed" && (
-                  <div className={styles.actions}>
-                    <button className={styles.cancelBtn}>
-                      Cancel Booking
-                    </button>
-
-                    <button className={styles.receiptBtn}>
-                      View Receipt
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

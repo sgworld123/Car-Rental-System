@@ -66,6 +66,8 @@ public class BookingService {
         Booking booking = Booking.builder()
                 .bookingId(bookingId)
                 .userId(userId)
+                .carName(bookingRequestDto.getCarName())
+                .imageUrl(bookingRequestDto.getImageUrl())
                 .vehicleId(bookingRequestDto.getVehicleId())
                 .cost(getCost(bookingRequestDto))
                 .fromDate(bookingRequestDto.getFromDate())
@@ -135,6 +137,9 @@ public class BookingService {
             throw new BookingAlreadyCompletedException("BOOKING ALREADY COMPLETED");
         }
         bookedVehicleAndDatesRepository.deleteByBookingId(bookingId);
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+
         bookingEventPublisher.handleBookingCancelled(BookingCancelledEvent.builder()
                 .bookingId(booking.getBookingId())
                 .userId(booking.getUserId())
@@ -169,6 +174,8 @@ public class BookingService {
         {
             response.add(BookingByIdResponse.builder()
                     .bookingId(b.getBookingId())
+                    .imageUrl(b.getImageUrl())
+                    .carName(b.getCarName())
                     .vehicleId(b.getVehicleId())
                     .cost(b.getCost())
                     .fromDate(b.getFromDate())

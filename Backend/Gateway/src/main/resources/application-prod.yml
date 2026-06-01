@@ -52,7 +52,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
 jwt:
-  secretKey: ${JWT_SECRET_KEY}
+  secretKey: "ilumorhaehapermapoiergoigp8y9p58,,7yq9084y9389y9yp9huh3ui3i38"
 
 logging:
   level:

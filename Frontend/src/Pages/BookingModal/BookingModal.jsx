@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useConfirmBooking } from "../../Hooks/useConfirmBooking";
 
-export default function BookingModal({ vehicle, fromDate, toDate, days, driverOption, onClose }) {
+export default function BookingModal({ vehicle, fromDate, toDate, days, driverOption, onClose, bookingId }) {
   const navigate = useNavigate();
   const [confirmed, setConfirmed] = useState(false);
 
@@ -17,14 +17,11 @@ export default function BookingModal({ vehicle, fromDate, toDate, days, driverOp
   const total = kmCost + driverCost + SERVICE_FEE;
   const [bookingLoading, setBookingLoading] = useState(false);
   const { handleConfirmBooking } = useConfirmBooking();
-  const [pendingBookingId, setPendingBookingId] = useState(null);
-
 
   const confirmBooking = async () => {
     try {
       setBookingLoading(true);
-      await handleConfirmBooking(pendingBookingId);
-      setShowModal(false);
+      await handleConfirmBooking(bookingId);
       navigate("/dashboard/bookings");
     } catch (error) {
       console.error("Confirm failed:", error);

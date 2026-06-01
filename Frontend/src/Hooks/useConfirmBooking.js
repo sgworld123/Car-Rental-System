@@ -7,6 +7,7 @@ export function useConfirmBooking() {
             console.log("Booking confirmed:", response.data);
             return response.data;
         } catch (error) {
+            console.error("Error confirming booking:", error.response ? error.response.data : error.message);
             console.error("Error confirming booking:", error);
             throw error;
         }

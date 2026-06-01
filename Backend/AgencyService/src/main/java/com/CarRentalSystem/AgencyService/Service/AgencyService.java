@@ -43,6 +43,8 @@ public class AgencyService {
         List<Vehicle> vehicles = agencyRegisterRequestDto.getVehicleInfo().stream()
                 .map(v -> Vehicle.builder()
                         .vehicleId(UUID.randomUUID().toString())
+                        .name(v.getName())
+                        .features(v.getFeatures())
                         .carModel(v.getCarModel())
                         .pricePerKm(v.getPricePerKm())
                         .carNumber(v.getCarNumber())

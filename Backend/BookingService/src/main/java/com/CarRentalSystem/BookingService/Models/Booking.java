@@ -21,6 +21,8 @@ public class Booking {
     private String bookingId;
     private String agencyId;
     private String userId;
+    private String imageUrl;
+    private String carName;
     private String vehicleId;
     private double cost;
     private LocalDate fromDate;

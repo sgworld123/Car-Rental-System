@@ -16,6 +16,8 @@ import java.util.List;
 @Document(collection = "vehicleData")
 public class Vehicle {
     private String vehicleId;
+    private String name;
+    private List<String> features;
     private String carNumber;
     private String driverName;
     private ModelType carModel;

@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Reviews {
-    private String userId;
-    private String reviewText;
-    private int rating;
+    private String name;
+    private String date;
+    private String text;
+    private String avatar;
 }

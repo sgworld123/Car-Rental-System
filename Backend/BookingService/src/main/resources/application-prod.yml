@@ -7,9 +7,9 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
+      host: redis-19625.crce295.us-east-1-1.ec2.cloud.redislabs.com
+      port: 19625
+      password: HcN77SiCvSfLv4tYY0CWd2QSRDXv0Iiu
 
     mongodb:
       uri: ${MONGODB_URI}

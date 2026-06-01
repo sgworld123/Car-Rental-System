@@ -14,6 +14,8 @@ public class BookingByIdResponse {
     private String vehicleId;
     private double cost;
     private LocalDate fromDate;
+    private String carName;
+    private String imageUrl;
 
     private LocalDate endDate;
     private BookingStatus status;

@@ -26,4 +26,7 @@ public class BookingRequestDto {
     @NotNull(message = "To date is required")
     @Future(message = "To date must be in the future")
     private LocalDate toDate;
+
+    private String imageUrl;
+    private String carName;
 }

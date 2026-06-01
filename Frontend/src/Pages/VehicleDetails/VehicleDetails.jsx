@@ -54,15 +54,18 @@ export default function VehicleDetails() {
   };
   const days = calcDays();
 
-  const [driverOption, setDriverOption] = useState("self"); // "self" | "driver"
+  const [driverOption, setDriverOption] = useState("self");
   const DRIVER_FEE_PER_DAY = 500;
   const SERVICE_FEE = 250;
   const KM = 100;
 
   const kmCost = vehicle?.pricePerKm * KM * days;
   const driverCost = driverOption === "driver" ? DRIVER_FEE_PER_DAY * days : 0;
-  const total = kmCost + driverCost + SERVICE_FEE;
+  const cost = kmCost + driverCost + SERVICE_FEE;
   const [showModal, setShowModal] = useState(false);
+  const [pendingBookingId, setPendingBookingId] = useState(null);
+  const imageUrl = vehicle?.images?.[0] || vehicle?.coverImage || "";
+  const carName = vehicle?.name || "the vehicle";
 
   const handleBook = async () => {
     if (!fromDate || !toDate) {
@@ -71,7 +74,8 @@ export default function VehicleDetails() {
     }
     try {
       setBookingLoading(true);
-      const payload = { vehicleId, total, fromDate, toDate };
+      console.log("Initiating booking with payload:", { vehicleId, cost, fromDate, toDate });
+      const payload = { vehicleId, cost, fromDate, toDate,imageUrl,carName };
       const result = await handleCreateBooking(payload);
       setPendingBookingId(result.bookingId);
       setShowModal(true);
@@ -82,8 +86,6 @@ export default function VehicleDetails() {
       setBookingLoading(false);
     }
   };
-
-  /* ── Loading / Error / Empty ── */
   if (loading) {
     return (
       <div className={styles.page}>
@@ -300,7 +302,7 @@ export default function VehicleDetails() {
 
           <div className={styles.totalRow}>
             <span>Total</span>
-            <h2>₹{total.toLocaleString('en-IN')}</h2>
+            <h2>₹{cost.toLocaleString('en-IN')}</h2>
           </div>
 
           <button className={styles.bookBtn} onClick={() => {
@@ -314,6 +316,7 @@ export default function VehicleDetails() {
               vehicle={vehicle}
               fromDate={fromDate}
               toDate={toDate}
+              bookingId={pendingBookingId}
               days={days}
               driverOption={driverOption}
               onClose={() => setShowModal(false)}
