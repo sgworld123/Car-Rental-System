@@ -177,10 +177,6 @@ export default function Bookings() {
 
                     <div className={styles.meta}>
                       <div>
-                        <label>BOOKING ID</label>
-                        <p>{shortId(booking.bookingId)}</p>
-                      </div>
-                      <div>
                         <label>DATE RANGE</label>
                         <p>{formatDateRange(booking.fromDate, booking.endDate)}</p>
                       </div>

@@ -9,7 +9,7 @@ export default function Header() {
       {/* Logo */}
       <div className={styles.logo}>
         <FaCarSide />
-        <span>DriveEasy</span>
+        <span>RentEngine</span>
       </div>
 
       {/* Navigation */}
