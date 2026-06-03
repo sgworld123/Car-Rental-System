@@ -20,6 +20,7 @@ export default function BookingModal({ vehicle, fromDate, toDate, days, driverOp
 
   const confirmBooking = async () => {
     try {
+      console.log("Confirming booking with ID:", bookingId);
       setBookingLoading(true);
       await handleConfirmBooking(bookingId);
       navigate("/dashboard/bookings");

@@ -164,7 +164,7 @@ export default function Bookings() {
         )}
 
         <div className={styles.list}>
-          {bookings.map((booking) => {
+          {[...bookings].reverse().map((booking) => {
             const isCancelling = cancellingIds.has(booking.bookingId);
 
             return (

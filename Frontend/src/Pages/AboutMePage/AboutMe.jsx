@@ -1,4 +1,5 @@
 import styles from "./AboutMe.module.css";
+import React from "react";
 
 import {
   FaInfoCircle,
@@ -12,159 +13,182 @@ import {
 } from "react-icons/fa";
 
 export default function About() {
+  const[likes, setLikes] = React.useState(0);
+  const handleLike = () => {
+    alert("Thanks for liking the project! 🙌");
+  };
+
   return (
     <div className={styles.page}>
-      <div className={styles.grid}></div>
 
-      <div className={styles.container}>
-        <div className={styles.heading}>
-          <h1>About DriveEasy</h1>
+    <div className={styles.grid}></div>
 
-          <p>
-            Refining the car rental experience through
-            thoughtful design and seamless technology.
-          </p>
+    <div className={styles.container}>
+
+      {/* HERO */}
+
+      <div className={styles.hero}>
+
+        <div className={styles.badge}>
+          Crafted with Java & System Design
         </div>
 
-        <div className={styles.layout}>
-          <div className={styles.left}>
-            <div className={styles.visionCard}>
-              <div className={styles.cardTitle}>
-                <FaInfoCircle />
-                <h2>The Vision</h2>
-              </div>
+        <h1 className={styles.title}>
+          Thanks for Visiting 👋
+        </h1>
 
-              <p>
-                DriveEasy was born from the idea that renting
-                a vehicle should be as enjoyable as the journey
-                itself. We’ve combined a warm minimalist
-                aesthetic with a performance-first architecture
-                to create a platform that feels intuitive,
-                reliable, and premium.
-              </p>
+        <p className={styles.subtitle}>
+          I appreciate you taking the time to explore this project and its architecture.
+        </p>
 
-              <div className={styles.techGrid}>
-                <div>
-                  <label>TECH STACK</label>
-                  <h4>Tailwind CSS v3</h4>
-                </div>
-
-                <div>
-                  <label>ARCHITECTURE</label>
-                  <h4>Atomic Design</h4>
-                </div>
-
-                <div>
-                  <label>AESTHETIC</label>
-                  <h4>Warm Minimal</h4>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.architectCard}>
-              <img
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1200&auto=format&fit=crop"
-                alt="architect"
-              />
-
-              <div className={styles.architectContent}>
-                <h2>Meet the Architect</h2>
-
-                <span>Lead UI/UX Developer</span>
-
-                <p>
-                  Dedicated to creating functional beauty in
-                  the digital space. Specializing in
-                  component-driven design systems and
-                  performance optimization.
-                </p>
-
-                <div className={styles.actions}>
-                  <button className={styles.githubBtn}>
-                    <FaGithub />
-                    GitHub
-                  </button>
-
-                  <button className={styles.contactBtn}>
-                    <FaEnvelope />
-                    Contact
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.right}>
-            <div className={styles.settingsCard}>
-              <h3>APPLICATION SETTINGS</h3>
-
-              <div className={styles.setting}>
-                <div className={styles.settingLeft}>
-                  <span className={styles.iconBox}>
-                    <FaMoon />
-                  </span>
-
-                  <p>Dark Mode</p>
-                </div>
-
-                <div className={styles.toggle}></div>
-              </div>
-
-              <div className={styles.setting}>
-                <div className={styles.settingLeft}>
-                  <span className={styles.iconBox}>
-                    <FaCodeBranch />
-                  </span>
-
-                  <p>App Version</p>
-                </div>
-
-                <span className={styles.version}>
-                  v2.4.0-stable
-                </span>
-              </div>
-
-              <div className={styles.setting}>
-                <div className={styles.settingLeft}>
-                  <span
-                    className={`${styles.iconBox} ${styles.red}`}
-                  >
-                    <FaTrashAlt />
-                  </span>
-
-                  <p>Clear Cache</p>
-                </div>
-
-                <button className={styles.resetBtn}>
-                  Reset
-                </button>
-              </div>
-            </div>
-
-            <div className={styles.opensourceCard}>
-              <h2>Open Source</h2>
-
-              <p>
-                DriveEasy is proudly open source. Join our
-                community and help shape the future of
-                mobility.
-              </p>
-
-              <button>
-                Visit Repository
-                <FaArrowRight />
-              </button>
-
-              <div className={styles.bgArrow}>‹</div>
-            </div>
-
-            <div className={styles.statusCard}>
-              <FaCircle />
-              <span>All systems operational</span>
-            </div>
-          </div>
-        </div>
       </div>
+
+      {/* ABOUT */}
+
+      <div className={styles.card}>
+
+        <h2 className={styles.sectionTitle}>
+          Who Built This?
+        </h2>
+
+        <p className={styles.text}>
+          Hi, I'm <b>Shreyansh Gupta</b>. I'm a backend-focused developer who
+          enjoys building scalable systems and exploring distributed
+          architectures.
+          <br /><br />
+
+          My main stack revolves around
+          <b> Java, Spring Boot, Microservices,
+          RabbitMQ, MongoDB, and distributed systems</b>.
+
+          <br /><br />
+
+          Alongside backend engineering,
+          I actively practice
+          <b> Data Structures & Algorithms</b>
+          through competitive programming and system-level problem solving.
+
+          <br /><br />
+
+          This project was built while experimenting with
+          real-world backend architecture, asynchronous communication,
+          and scalable service design.
+        </p>
+
+      </div>
+
+      {/* ARCHITECTURE */}
+
+      <div className={styles.card}>
+
+        <h2 className={styles.sectionTitle}>
+          System Architecture
+        </h2>
+
+        <p className={styles.text}>
+          If you're interested in understanding how the system is structured,
+          you can explore the full architecture and implementation on GitHub.
+        </p>
+
+        <a
+          className={styles.primaryLink}
+          href="https://github.com/sgworld123/Car-Rental-System"
+          target="_blank"
+          rel="noreferrer"
+        >
+          View Architecture on GitHub →
+        </a>
+
+      </div>
+
+      {/* LIKE SECTION */}
+
+      <div className={styles.card}>
+
+        <h2 className={styles.sectionTitle}>
+          Enjoyed the Project?
+        </h2>
+
+        <p className={styles.text}>
+          If you liked exploring the system, feel free to leave a like.
+        </p>
+
+        <button
+          onClick={handleLike}
+          className={styles.likeButton}
+        >
+          👍 Like
+        </button>
+
+      </div>
+
+      {/* LINKS */}
+
+      <div className={styles.card}>
+
+        <h2 className={styles.sectionTitle}>
+          More About Me
+        </h2>
+
+        <p className={styles.text}>
+          If you'd like to connect or explore more of my work:
+        </p>
+
+        <div className={styles.linksGrid}>
+
+          <a
+            className={styles.profileLink}
+            href="https://leetcode.com/u/sgworld123/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>LeetCode</span>
+            <small>leetcode.com/u/sgworld123</small>
+          </a>
+
+          <a
+            className={styles.profileLink}
+            href="https://www.codechef.com/users/sgworld123"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>CodeChef</span>
+            <small>codechef.com/users/sgworld123</small>
+          </a>
+
+          <a
+            className={styles.profileLink}
+            href="https://www.linkedin.com/in/dsa-dev-shreyansh/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>LinkedIn</span>
+            <small>linkedin.com/in/dsa-dev-shreyansh</small>
+          </a>
+
+          <a
+            className={styles.profileLink}
+            href="https://portfolio-new-ten-ruby.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>Portfolio</span>
+            <small>View Portfolio</small>
+          </a>
+
+        </div>
+
+      </div>
+
+      {/* FOOTER */}
+
+      <p className={styles.footer}>
+        Thanks again for checking out the project 🙌
+      </p>
+
     </div>
-  );
+
+  </div>
+);
+
 }

@@ -6,7 +6,6 @@ import Register from './Pages/RegisterPage/Register'
 import Home from './Pages/HomePage/Home'
 import DashBoardLayout from './Pages/DashBoardLayout'
 import AgencyPage from './Pages/AgencyPage/AgencyPage'
-import { ConfirmBooking } from './Pages/ConfirmBooking'
 import VehicleDetails from './Pages/VehicleDetails/VehicleDetails'
 import MyBookings from './Pages/MyBookings/MyBookings'
 import Profile from './Pages/Profile/Profile'
@@ -24,11 +23,10 @@ function App() {
       <Route path='/dashboard' element={<ProtectedRoute><DashBoardLayout /></ProtectedRoute>}>
         <Route index element={<Home />} />
         <Route path="bookings" element={<MyBookings />} />
-        <Route path="settings" element={<AboutMe />} />
+        <Route path="aboutme" element={<AboutMe />} />
         <Route path="profile" element={<Profile />} />
         <Route path="agency/:id" element={<AgencyPage />} />                              
         <Route path="agency/:id/vehicle-details/:vehicleId" element={<VehicleDetails />} /> 
-        <Route path="confirm-booking" element={<ConfirmBooking />} />                    
       </Route>
 
     </Routes>

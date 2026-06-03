@@ -36,17 +36,6 @@ export default function AgencyPage() {
     <div className={styles.page}>
       <div className={styles.grid}></div>
 
-      <header className={styles.topbar}>
-        <div className={styles.brand}>
-          <FaArrowLeft />
-          <span>DriveEasy</span>
-        </div>
-
-        <button className={styles.themeBtn}>
-          <FaSun />
-        </button>
-      </header>
-
       <section className={styles.hero}>
         <img src={agency?.agencyImage} alt={agency?.name} />
 
@@ -184,7 +173,7 @@ export default function AgencyPage() {
                     <h4>${vehicle.pricePerKm}</h4>
                   </div>
 
-                  <button
+                  <button className={styles.bookBtn}
                     onClick={() => {
                       console.log("id:", id, "vehicleId:", vehicle.vehicleId, "from:", fromDate, "to:", toDate)
                       navigate(`/dashboard/agency/${id}/vehicle-details/${vehicle.vehicleId}?from=${fromDate}&to=${toDate}`)

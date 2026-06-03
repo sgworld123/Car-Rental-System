@@ -36,6 +36,7 @@ public class UserService {
                 .name(userCreatedEventDto.getUserName())
                 .email(userCreatedEventDto.getUserEmail())
                 .phone(userCreatedEventDto.getPhoneNumber())
+                .imageUrl(userCreatedEventDto.getImageUrl())
                 .build();
         userRepository.save(user);
         log("Created user with id " +user.getId());

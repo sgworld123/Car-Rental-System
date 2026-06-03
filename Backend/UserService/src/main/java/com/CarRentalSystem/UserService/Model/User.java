@@ -18,4 +18,7 @@ public class User {
     private String name;
     private String phone;
     private String email;
+    private String rating;
+    private String imageUrl;
+    private int bookings;
 }

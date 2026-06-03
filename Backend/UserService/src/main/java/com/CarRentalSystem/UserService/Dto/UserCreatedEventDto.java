@@ -11,5 +11,6 @@ public class UserCreatedEventDto {
     private String userName;
     private String userEmail;
     private String phoneNumber;
+    private String imageUrl;
 
 }
